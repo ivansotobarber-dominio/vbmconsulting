@@ -10,21 +10,22 @@
     sections.forEach((section) => observer.observe(section));
   }
   const consolePanel = document.querySelector('.decision-console');
-  if (!consolePanel) return;
-  const readout = document.createElement('div');
-  readout.className = 'field-readout';
-  readout.innerHTML = '<i aria-hidden="true"></i><span>Modo de lectura</span><b>Diagnostico inicial</b>';
-  consolePanel.prepend(readout);
+  if (consolePanel) {
+    const readout = document.createElement('div');
+    readout.className = 'field-readout';
+    readout.innerHTML = '<i aria-hidden="true"></i><span>Modo de lectura</span><b>Diagnóstico inicial</b>';
+    consolePanel.prepend(readout);
   const labels = {
     'encargo-informe':'Informe tecnico',
     'encargo-expediente':'Proyecto y expediente',
     licitaciones:'Licitacion publica'
   };
-  consolePanel.querySelectorAll('a[href]').forEach((link) => {
-    const href = link.getAttribute('href') || '';
-    const key = Object.keys(labels).find((name) => href.includes(name));
-    if (!key) return;
-    const update = () => { readout.querySelector('b').textContent = labels[key]; };
-    link.addEventListener('pointerenter', update); link.addEventListener('focus', update);
-  });
+    consolePanel.querySelectorAll('a[href]').forEach((link) => {
+      const href = link.getAttribute('href') || '';
+      const key = Object.keys(labels).find((name) => href.includes(name));
+      if (!key) return;
+      const update = () => { readout.querySelector('b').textContent = labels[key]; };
+      link.addEventListener('pointerenter', update); link.addEventListener('focus', update);
+    });
+  }
 })();

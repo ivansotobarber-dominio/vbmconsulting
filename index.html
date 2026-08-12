@@ -12,11 +12,12 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&family=Newsreader:opsz,wght@6..72,500;6..72,600;6..72,700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="modern.css">
+  <link rel="stylesheet" href="studio.css">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="manifest" href="site.webmanifest">
   <script type="application/ld+json">
   {"@context":"https://schema.org","@graph":[
-    {"@type":"ProfessionalService","@id":"https://vbmconsulting.es/#ingenieria","name":"VB&M Ingeniería","alternateName":"Veredas, Barrancos y Maretas, S.L.","description":"Ingeniería de caminos y consultoría técnica para informes, expedientes, asistencia de obra, activos e infraestructuras.","areaServed":{"@type":"Place","name":"Canarias"},"knowsAbout":["ingeniería de caminos","informes técnicos","peritajes","asistencia técnica","licitaciones","infraestructuras","gestión de activos","BIM","GIS"],"url":"https://vbmconsulting.es/"},
+    {"@type":"ProfessionalService","@id":"https://vbmconsulting.es/#ingenieria","name":"VB&M Ingeniería","description":"Ingeniería de caminos y consultoría técnica para informes, expedientes, asistencia de obra, activos e infraestructuras.","areaServed":{"@type":"Place","name":"Canarias"},"knowsAbout":["ingeniería de caminos","informes técnicos","peritajes","asistencia técnica","licitaciones","infraestructuras","gestión de activos","BIM","GIS"],"url":"https://vbmconsulting.es/"},
     {"@type":"WebSite","name":"VB&M Ingeniería","url":"https://vbmconsulting.es/","inLanguage":"es","description":"Soluciones de ingeniería y consultoría técnica desde Canarias."}
   ]}
   </script>
@@ -35,13 +36,23 @@
   <main id="contenido">
     <section class="hero">
       <div class="hero-grid" aria-hidden="true"></div>
-      <figure class="hero-bim-visual" aria-hidden="true"><img src="assets/vbm-territory-bim-v01.png" alt=""></figure>
+      <figure class="hero-bim-visual" aria-hidden="true">
+        <video autoplay muted loop playsinline preload="metadata" poster="assets/video/vbm-territorio-bim-reference-v01.png">
+          <source src="assets/video/vbm-territorio-bim-loop-v01.mp4" type="video/mp4">
+        </video>
+      </figure>
       <div class="hero-copy">
-        <p class="eyebrow">Ingeniería de caminos · Canarias</p>
-        <h1>Cuando el problema es técnico, la decisión no puede ser intuitiva.</h1>
-        <p class="hero-lead">VB&M prepara la información, el análisis y el expediente que permiten decidir, contratar o ejecutar con criterio. Informes, proyectos, peritajes, asistencia técnica y apoyo a licitaciones.</p>
-        <div class="hero-actions"><a class="button button-primary" href="#contacto">Plantear un encargo</a><a class="button button-text" href="#soluciones">Ver cómo intervenimos <span aria-hidden="true">↓</span></a></div>
+        <p class="eyebrow">Ingeniería de caminos y consultoría técnica · Canarias</p>
+        <h1>Del territorio y el dato a una decisión que se puede defender.</h1>
+        <p class="hero-lead">Informes, expedientes, proyectos, asistencia a obra y licitaciones para pasar de una necesidad técnica dispersa a una acción clara, trazable y ejecutable.</p>
+        <div class="hero-actions"><a class="button button-primary" href="#contacto">Plantear un caso</a><a class="button button-text" href="#soluciones">Ver servicios de entrada <span aria-hidden="true">↓</span></a></div>
+        <dl class="hero-proof" aria-label="Ámbitos de trabajo"><div><dt>01</dt><dd>Diagnóstico e informe</dd></div><div><dt>02</dt><dd>Expediente y proyecto</dd></div><div><dt>03</dt><dd>Asistencia y control</dd></div></dl>
         <div class="hero-trust"><span>Conocimiento global</span><i></i><span>Aplicación local</span><i></i><span>Soluciones a medida</span></div>
+        <div class="hero-cv" aria-label="Trayectoria profesional">
+          <strong>+10 años</strong>
+          <span>Ingeniería de caminos, dirección de proyectos y consultoría estratégica.</span>
+          <small>ICCP · MBA · PMP · Informes, licitaciones, activos e infraestructuras.</small>
+        </div>
       </div>
       <aside class="decision-console" aria-label="Cómo puede ayudar VB&M">
         <p class="console-label">Punto de partida</p>
@@ -69,11 +80,12 @@
     </section>
 
     <section class="section solutions" id="soluciones">
-      <div class="section-heading split-heading"><div><p class="eyebrow">Soluciones</p><h2>Entrar por una necesidad concreta, no por un catálogo infinito.</h2></div><p>VB&M puede empezar por un encargo pequeño y bien delimitado. Si el caso lo exige, se amplía a proyecto, asistencia o una oficina técnica de seguimiento.</p></div>
+      <div class="section-heading split-heading"><div><p class="eyebrow">Servicios de entrada</p><h2>Un problema concreto. Una salida técnica clara.</h2></div><p>No hace falta encargar un proyecto completo para empezar. VB&M entra por el punto que desbloquea la decisión y amplía el alcance solo cuando aporta valor.</p></div>
       <div class="solution-grid">
-        <article id="encargo-informe"><p class="number">01</p><h3>Informe, diagnóstico o peritaje</h3><p>Para entender el estado de un activo, un daño, una incidencia de obra, una inversión o una alternativa técnica antes de tomar posición.</p><ul><li>Alcance y preguntas a responder</li><li>Documentación, fotos, visita y análisis</li><li>Conclusiones, límites y próximos pasos</li></ul><a href="#contacto">Preparar diagnóstico <span>→</span></a></article>
-        <article id="encargo-expediente"><p class="number">02</p><h3>Expediente técnico listo para mover</h3><p>Para pasar de una necesidad dispersa a un documento defendible: memoria, alternativas, planos, mediciones, presupuesto y hoja de ruta.</p><ul><li>Definición del problema y alcance</li><li>Inventario de información y carencias</li><li>Entregables preparados para decidir o contratar</li></ul><a href="#contacto">Estructurar expediente <span>→</span></a></article>
-        <article><p class="number">03</p><h3>Asistencia y control de ejecución</h3><p>Para no perder el control entre el expediente y la realidad de obra: incidencias, mediciones, certificaciones, cambios y decisiones de campo.</p><ul><li>Seguimiento técnico y documental</li><li>Control de cambios e incidencias</li><li>Reportes ejecutivos para dirección</li></ul><a href="#contacto">Hablar de una obra <span>→</span></a></article>
+        <article id="encargo-informe"><p class="number">01 / Leer</p><h3>Informe, diagnóstico o peritaje</h3><p>Para entender un activo, un daño, una incidencia, una inversión o una alternativa antes de tomar posición.</p><ul><li>Pregunta técnica y alcance definidos</li><li>Documentación, visita, datos y cálculos</li><li>Conclusiones, límites y siguiente decisión</li></ul><a href="#contacto">Preparar un diagnóstico <span>→</span></a></article>
+        <article id="encargo-expediente"><p class="number">02 / Ordenar</p><h3>Expediente, proyecto y presupuesto</h3><p>Para convertir una necesidad en un alcance defendible con memoria, alternativas, planos, mediciones y ruta de contratación.</p><ul><li>Base documental e inventario de carencias</li><li>Opciones comparables con supuestos explícitos</li><li>Documentación preparada para decidir o mover</li></ul><a href="#contacto">Estructurar un expediente <span>→</span></a></article>
+        <article><p class="number">03 / Ejecutar</p><h3>Asistencia a obra y control técnico</h3><p>Para conservar el control entre el papel y el terreno, con incidencias, mediciones, cambios, certificaciones y reporte ejecutivo.</p><ul><li>Seguimiento técnico y documental</li><li>Control de cambios y riesgos de ejecución</li><li>Información útil para propiedad y dirección</li></ul><a href="#contacto">Hablar de una intervención <span>→</span></a></article>
+        <article><p class="number">04 / Competir</p><h3>Licitaciones y oficina técnica</h3><p>Para leer una oportunidad con criterio, reforzar una propuesta técnica y llevar el contrato con trazabilidad y control.</p><ul><li>Go/no-go, requisitos y riesgos</li><li>Metodología, planificación y evidencias</li><li>Seguimiento de obligaciones y entregables</li></ul><a href="#contacto">Revisar una licitación <span>→</span></a></article>
       </div>
     </section>
 
@@ -99,7 +111,7 @@
 
     <section class="contact-section" id="contacto"><div><p class="eyebrow">Primer contacto</p><h2>Traiga el problema. Ordenamos el siguiente paso.</h2><p>No hace falta tenerlo todo resuelto. Indique qué ocurre, qué documentación existe y qué decisión necesita tomar.</p></div><form class="contact-form" data-contact-form><label>Nombre o entidad<input required name="nombre" autocomplete="name" placeholder="Nombre y organización"></label><label>Correo<input required name="correo" type="email" autocomplete="email" placeholder="correo@empresa.com"></label><label>¿Qué necesita resolver?<textarea required name="mensaje" rows="4" placeholder="Activo, obra, informe, licitación o decisión bloqueada"></textarea></label><button class="button button-primary" type="submit">Preparar correo de contacto</button><p class="form-note">No se envía información desde esta web. Se abrirá su cliente de correo con el borrador preparado.</p></form></section>
   </main>
-  <footer class="site-footer"><div><strong>VB&M Ingeniería</strong><span>Veredas, Barrancos y Maretas, S.L.</span></div><nav><a href="#soluciones">Soluciones</a><a href="#licitaciones">Licitaciones</a><a href="#metodo">Método</a><a href="#contacto">Contacto</a></nav><small>Web en preparación. Antes de lanzamiento público se completarán los datos societarios, canal de contacto y políticas aplicables.</small></footer>
+  <footer class="site-footer"><div><strong>VB&M Ingeniería</strong><span>Proyecto empresarial en constitución</span></div><nav><a href="#soluciones">Soluciones</a><a href="#licitaciones">Licitaciones</a><a href="#metodo">Método</a><a href="#contacto">Contacto</a></nav><small>Web en preparación. Antes de lanzamiento público se completarán los datos societarios, canal de contacto y políticas aplicables.</small></footer>
   <script src="main.js" defer></script>
   <script src="modern.js" defer></script>
 </body>
