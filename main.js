@@ -21,8 +21,7 @@ if (menuButton && menu) {
     menuButton.setAttribute('aria-expanded', String(isOpen));
   });
 }
-const form = document.querySelector('[data-contact-form]');
-if (form) {
+document.querySelectorAll('[data-contact-form]').forEach((form) => {
   form.addEventListener('submit', (event) => {
     event.preventDefault();
     const data = new FormData(form);
@@ -30,4 +29,4 @@ if (form) {
     const body = `Nombre o entidad: ${data.get('nombre')}\nCorreo: ${data.get('correo')}\n\nNecesidad:\n${data.get('mensaje')}`;
     window.location.href = `mailto:contacto@vbmconsulting.es?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   });
-}
+});
