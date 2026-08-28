@@ -1,0 +1,24 @@
+# VB&M Ingenieria
+
+> Marca profesional en desarrollo para servicios de ingenieria de caminos y consultoria tecnica desde Canarias. El foco es convertir problemas de obra, activos, territorio y contratos en informes, expedientes y decisiones ejecutables.
+
+## Paginas principales
+
+- [Inicio](https://vbmconsulting.es/): soluciones, experiencia, licitaciones, metodo, sectores y contacto.
+- [Ingenieria de caminos](https://vbmconsulting.es/ingenieria-de-caminos.html): proyectos, informes tecnicos, peritajes, asistencia de obra y activos.
+
+## Capacidades declaradas
+
+- Informes, diagnosticos y peritajes tecnicos.
+- Expedientes, proyectos, mediciones y presupuestos.
+- Control de costes, planificacion, camino critico y auditoria de obra.
+- Asistencia tecnica, seguimiento de contratos y apoyo a licitaciones.
+- Inventarios, BIM, GIS, modelos digitales y priorizacion de inversiones.
+- Consultoria estrategica y operativa aplicada a problemas tecnicos.
+
+## Ambito y limites
+
+- Base territorial: Canarias.
+- La web no publica todavia casos de cliente, testimonios ni una cartera de obras verificable.
+- VB&M es una marca profesional y un proyecto empresarial en constitucion; no debe describirse como sociedad inscrita mientras la web mantenga ese estado.
+- Los alcances, colaboraciones y especialidades necesarias se definen para cada encargo antes de asumir compromisos.

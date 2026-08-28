@@ -266,16 +266,68 @@
 }
 
 @media (max-width: 920px) {
+  .hero {
+    display: grid;
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+
+  .hero-copy {
+    padding: 72px 24px 36px;
+  }
+
+  .hero-copy h1 {
+    max-width: 14ch;
+  }
+
   .experience-section {
     grid-template-columns: 1fr;
   }
 
   .landing-contact {
-    margin: 0 24px 60px;
+    margin: 0 24px 64px;
+    width: auto;
   }
 }
 
 @media (max-width: 620px) {
+  .hero-copy {
+    padding: 56px 18px 30px;
+  }
+
+  .hero-copy h1 {
+    font-size: clamp(40px, 12vw, 48px);
+    line-height: .94;
+    max-width: none;
+  }
+
+  .hero-lead {
+    font-size: 15px;
+    line-height: 1.55;
+  }
+
+  .hero-proof {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .hero-proof dt {
+    font-size: 24px;
+  }
+
+  .hero-proof dd {
+    font-size: 10px;
+  }
+
+  .hero-trust {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .hero-trust i {
+    display: none;
+  }
+
   .experience-section,
   .control-section {
     padding: 76px 18px;
@@ -289,6 +341,15 @@
 
   .landing-contact {
     margin: 0 18px 42px;
-    padding: 25px;
+    padding: 24px 22px;
+  }
+
+  .landing-contact h2 {
+    font-size: 38px;
+  }
+
+  .contact-direct {
+    align-items: flex-start;
+    flex-direction: column;
   }
 }
