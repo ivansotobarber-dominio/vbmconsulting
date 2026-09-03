@@ -6,6 +6,14 @@
 
 - [Inicio](https://vbmconsulting.es/): soluciones, experiencia, licitaciones, metodo, sectores y contacto.
 - [Ingenieria de caminos](https://vbmconsulting.es/ingenieria-de-caminos.html): proyectos, informes tecnicos, peritajes, asistencia de obra y activos.
+- [BBL](https://vbmconsulting.es/bbl-automatizacion-documental.html): automatizacion documental controlada, reglas de coherencia, trazabilidad y exportacion para revision profesional.
+- [CaseSignal](https://vbmconsulting.es/casesignal-seleccion-talento.html): evaluacion estructurada mediante simulaciones de trabajo, evidencia observable e informes para decision humana.
+
+## Productos digitales
+
+- BBL transforma modelos, formularios, reglas y listas de control del cliente en un flujo privado de generacion y auditoria documental. No sustituye el criterio ni la revision juridica.
+- CaseSignal separa juegos de capacidad y casos de trabajo para observar razonamiento, priorizacion y comunicacion. No toma decisiones automaticas de contratacion ni formula afirmaciones psicometricas sin validacion.
+- Ambos productos se ofrecen inicialmente mediante pilotos acotados, con alcance, criterios de aceptacion, seguridad y responsabilidades definidos antes de tratar informacion real.
 
 ## Capacidades declaradas
 

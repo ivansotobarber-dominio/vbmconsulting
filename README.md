@@ -2,6 +2,8 @@
 
 Web matriz de VBM con foco principal en VB&M Ingenieria, ingenieria de caminos, proyectos, informes, peritajes y asistencia de obra.
 
+La web incorpora dos lineas de producto digital vinculadas a consultoria: BBL para automatizacion documental controlada y CaseSignal para evaluacion estructurada de talento.
+
 ## Estado
 
 Primera identidad publica y prototipo editorial. La denominacion legal, dominio, correo, telefono, portfolio y datos societarios deben confirmarse antes de publicar como web comercial definitiva.
@@ -22,4 +24,10 @@ Primera identidad publica y prototipo editorial. La denominacion legal, dominio,
 4. Incorporar casos de uso reales con autorizacion.
 5. Crear paginas SEO por servicio y sector.
 6. Conectar Search Console, analitica y ficha de empresa si existe ubicacion publica.
+
+## Paginas de producto
+
+- `bbl-automatizacion-documental.html`: propuesta de piloto BBL, flujo de trabajo, limites y requisitos de control.
+- `casesignal-seleccion-talento.html`: propuesta de piloto CaseSignal, arquitectura Games/Cases y evaluacion responsable.
+- `digital-products.css`: lenguaje visual compartido y variantes especificas de ambos productos.
 
