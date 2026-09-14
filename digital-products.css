@@ -24,3 +24,42 @@
 @media(max-width:920px){.product-hero,.product-proof,.product-pilot,.product-cta,.digital-products-head{grid-template-columns:1fr}.product-hero-copy{padding:75px 24px}.product-object{min-height:auto;padding:54px 24px}.product-strip,.product-sequence{grid-template-columns:repeat(2,1fr)}.product-strip div:last-child,.product-sequence article:last-child{grid-column:1/-1}.product-sequence article{border-bottom:1px solid var(--line)}.product-cta{align-items:start}.digital-product-links{grid-template-columns:1fr}.digital-product-links a:first-child{border-bottom:1px solid var(--line);border-right:0}}
 @media(max-width:620px){.product-hero h1{font-size:50px}.product-hero-copy{padding:62px 18px}.product-object{padding:38px 18px}.document-workbench{grid-template-columns:1fr}.document-sheet{margin:18px}.rule-rail{grid-template-columns:repeat(2,1fr)}.rule-rail small{grid-column:1/-1}.signal-trace,.product-strip,.product-sequence,.limit-grid{grid-template-columns:1fr}.product-strip div,.product-sequence article{border-bottom:1px solid rgba(11,32,33,.2);border-right:0}.product-section{padding:72px 18px}.product-proof,.product-pilot{gap:45px}.proof-list div,.pilot-spec div{grid-template-columns:1fr;gap:6px}.product-cta{padding:64px 18px}.digital-products-band{padding:68px 18px;scroll-margin-top:69px}.digital-product-links a{grid-template-columns:82px minmax(0,1fr) auto}.digital-product-links strong{font-size:24px}.sector-grid{grid-template-columns:1fr}.sector-grid button{width:100%}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.button{transition:none}}
+
+/* M7A: refinements limited to the two commercial product pages. */
+.m7a-commercial{--mist:#4d605f;letter-spacing:0}
+.m7a-commercial *{letter-spacing:0}
+.m7a-commercial .product-hero{min-height:600px}
+.m7a-commercial .product-hero-copy{padding-top:60px;padding-bottom:60px;padding-right:38px}
+.m7a-commercial .product-hero h1{font-size:64px;line-height:1.02}
+.m7a-commercial .product-hero h1 span{display:block;font-size:46px;margin-top:12px}
+.m7a-commercial .product-object{min-height:600px;padding-left:32px;gap:18px}
+.m7a-commercial .product-guardrail{margin-top:30px;text-transform:none;font-family:Manrope,Arial,sans-serif;font-size:13px}
+.m7a-commercial .product-section{padding-top:80px;padding-bottom:80px}
+.m7a-commercial .product-section h2,.m7a-commercial .product-cta h2{font-size:46px;line-height:1.08}
+.m7a-commercial .product-proof,.m7a-commercial .product-pilot{gap:48px;grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+.m7a-commercial .product-pilot .product-section-intro{color:#dce8e7}
+.m7a-commercial .product-sequence{margin-top:36px}
+.m7a-commercial .product-sequence article{min-width:0;padding-left:14px;padding-right:14px}
+.m7a-commercial .product-sequence p{font-size:14px}
+.m7a-commercial .product-sequence h3{font-size:25px}
+.m7a-commercial .example-caption{margin:0;color:#eee;font-family:'DM Mono',monospace;font-size:12px}
+.m7a-commercial .document-workbench{min-height:360px;grid-template-columns:minmax(0,1fr) 145px}
+.m7a-commercial .document-sheet{margin:24px 0 24px 24px;padding:24px}
+.m7a-commercial .doc-field{overflow-wrap:anywhere}
+.m7a-commercial .doc-check{font-size:13px}
+.m7a-commercial .rule-rail{padding:24px 16px}
+.m7a-commercial .rule{font-size:12px}
+.m7a-commercial .signal-console-head{gap:16px;flex-wrap:wrap}
+.m7a-commercial .signal-console-head strong{font-size:18px}
+.m7a-commercial .example-label{color:var(--signal);font-size:12px}
+.m7a-commercial .evidence-example{margin:0}
+.m7a-commercial .evidence-example div{border-bottom:1px solid #49615a;padding:18px 0;display:grid;grid-template-columns:90px minmax(0,1fr);gap:14px}
+.m7a-commercial .evidence-example div:last-child{border:0;padding-bottom:0}
+.m7a-commercial .evidence-example dt{font-size:12px;color:var(--signal)}
+.m7a-commercial .evidence-example dd{margin:0;font-size:14px}
+.m7a-commercial .product-cta .button{white-space:normal;text-align:center}
+.m7a-commercial a:focus-visible,.m7a-commercial button:focus-visible{outline:3px solid #bb4932;outline-offset:4px}
+.m7a-commercial .site-footer a:focus-visible,.m7a-commercial .product-cta a:focus-visible{outline-color:#ffd66d}
+@media(max-width:1100px){.m7a-commercial .product-header{flex-wrap:wrap;gap:18px}.m7a-commercial .product-hero{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.m7a-commercial .document-workbench{grid-template-columns:1fr}.m7a-commercial .document-sheet{margin:18px}.m7a-commercial .rule-rail{grid-template-columns:repeat(2,minmax(0,1fr))}.m7a-commercial .rule-rail small{grid-column:1/-1}.m7a-commercial .product-object{padding-right:24px}.m7a-commercial .product-sequence{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:920px){.m7a-commercial .product-hero,.m7a-commercial .product-proof,.m7a-commercial .product-pilot{grid-template-columns:1fr}.m7a-commercial .product-object{min-height:auto;padding:40px 24px}.m7a-commercial .product-hero-copy{padding:54px 24px}.m7a-commercial .product-hero h1{font-size:58px}.m7a-commercial .product-sequence article{border-bottom:1px solid var(--line)}}
+@media(max-width:620px){.m7a-commercial .product-header{flex-wrap:nowrap;gap:10px}.m7a-commercial .brand{gap:8px}.m7a-commercial .brand strong{font-size:13px}.m7a-commercial .brand-mark{width:64px;flex-shrink:0}.m7a-commercial .menu-button{min-height:44px}.m7a-commercial .product-hero h1{font-size:48px}.m7a-commercial .product-hero h1 span{font-size:36px}.m7a-commercial .product-hero-copy{padding:40px 18px}.m7a-commercial .product-lead{font-size:16px;margin-top:20px}.m7a-commercial .product-actions{gap:16px;margin-top:24px}.m7a-commercial .product-guardrail{margin-top:24px}.m7a-commercial .product-section{padding:56px 18px}.m7a-commercial .product-section h2,.m7a-commercial .product-cta h2{font-size:36px}.m7a-commercial .product-object{padding:32px 18px}.m7a-commercial .product-sequence{grid-template-columns:1fr}.m7a-commercial .evidence-example div{grid-template-columns:1fr;gap:5px}.m7a-commercial .product-cta{padding:56px 18px}.m7a-commercial .site-footer nav a{min-height:44px;display:inline-flex;align-items:center}}
