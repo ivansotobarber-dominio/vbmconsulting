@@ -21,12 +21,5 @@ if (menuButton && menu) {
     menuButton.setAttribute('aria-expanded', String(isOpen));
   });
 }
-document.querySelectorAll('[data-contact-form]').forEach((form) => {
-  form.addEventListener('submit', (event) => {
-    event.preventDefault();
-    const data = new FormData(form);
-    const subject = `Consulta web VB&M: ${data.get('nombre')}`;
-    const body = `Nombre o entidad: ${data.get('nombre')}\nCorreo: ${data.get('correo')}\n\nNecesidad:\n${data.get('mensaje')}`;
-    window.location.href = `mailto:contacto@vbmconsulting.es?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  });
-});
+import { mountContactForm } from './contact-form.mjs';
+document.querySelectorAll('[data-contact-form]').forEach((form) => mountContactForm(form));

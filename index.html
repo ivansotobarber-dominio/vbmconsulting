@@ -69,12 +69,20 @@
       <aside class="landing-contact" aria-label="Contacto principal VB&M">
         <p class="console-label">Consulta inicial</p>
         <h2>¿Qué decisión está bloqueada?</h2>
-        <p>Describa el caso. Prepararemos un correo con el alcance, la documentación disponible y el resultado que necesita.</p>
+        <p>Puede escribir al correo de contacto con el alcance, la documentación disponible y el resultado que necesita.</p>
         <form class="contact-form compact-contact-form" data-contact-form>
-          <label>Nombre o entidad<input required name="nombre" autocomplete="name" placeholder="Nombre y organización"></label>
-          <label>Correo<input required name="correo" type="email" autocomplete="email" placeholder="correo@empresa.com"></label>
-          <label>Necesidad<textarea required name="mensaje" rows="3" placeholder="Informe, obra, licitación, presupuesto, planificación o activo"></textarea></label>
-          <button class="button button-primary" type="submit">Preparar consulta por correo</button>
+          <fieldset disabled style="border:0;padding:0;margin:0;min-width:0;display:grid;gap:12px">
+          <legend>Consulta inicial</legend>
+          <label>Nombre o entidad<input required name="nombre" maxlength="120" autocomplete="name" placeholder="Nombre y organización"></label>
+          <label>Correo<input required name="email" type="email" maxlength="254" autocomplete="email" placeholder="correo@empresa.com"></label>
+          <label>Necesidad<textarea required name="mensaje" maxlength="4000" rows="3" placeholder="Informe, obra, licitación, presupuesto, planificación o activo"></textarea></label>
+          <input name="_gotcha" type="text" hidden tabindex="-1" autocomplete="off" aria-hidden="true">
+          <label style="display:flex;align-items:center;gap:10px"><input name="privacidad" type="checkbox" required value="leida" style="width:20px;height:20px">He leído la información de privacidad.</label>
+          <button class="button button-primary" type="submit">Enviar consulta</button>
+          </fieldset>
+          <p class="form-note" style="color:var(--ink);font-size:14px">Responsable: Iván Soto Barber. Finalidad: atender su consulta, por interés legítimo o medidas precontractuales según la solicitud. Proveedores: Formspree y correo, con tratamiento en Estados Unidos. Derechos: contacto@vbmconsulting.es. <a href="privacidad.html">Información de privacidad</a></p>
+          <p class="form-note" style="color:var(--ink);font-size:14px" data-contact-status role="status" aria-live="polite" aria-atomic="true">El envío desde la web no está disponible. Puede escribir al correo de contacto.</p>
+          <noscript>Para contactar sin JavaScript, utilice el enlace de correo.</noscript>
         </form>
         <div class="contact-direct">
           <a href="mailto:contacto@vbmconsulting.es">contacto@vbmconsulting.es</a>
@@ -179,10 +187,21 @@
 
     <section class="section faq-section" aria-labelledby="faq-title"><div class="section-heading"><p class="eyebrow">Preguntas directas</p><h2 id="faq-title">Antes de hablar, esto conviene saberlo.</h2></div><div class="faq-list"><details open><summary>¿Puede VB&M asumir un encargo pequeño?</summary><p>Sí. El punto de partida puede ser un informe, un diagnóstico, una revisión de documentación o la estructuración de un expediente. La prioridad es que el alcance sea claro y el resultado sirva para decidir.</p></details><details><summary>¿Qué información conviene tener para una primera conversación?</summary><p>El problema que hay que resolver, ubicación o activo afectado, documentación existente, fecha relevante y la decisión que está bloqueada. Si falta información, se ordena como parte del trabajo.</p></details><details><summary>¿VB&M ejecuta instalaciones u obra directamente?</summary><p>La función inicial es ingeniería, definición, análisis, asistencia y control. Cuando se necesiten especialistas, instaladores o colaboradores, se delimita su rol antes de comprometer el encargo.</p></details><details><summary>¿Dónde trabaja?</summary><p>Canarias es la base. El alcance geográfico se acuerda según el encargo, la necesidad de presencia y la capacidad de seguimiento.</p></details></div></section>
 
-    <section class="contact-section" id="contacto"><div><p class="eyebrow">Primer contacto</p><h2>Traiga el problema. Ordenamos el siguiente paso.</h2><p>No hace falta tenerlo todo resuelto. Indique qué ocurre, qué documentación existe y qué decisión necesita tomar.</p></div><form class="contact-form" data-contact-form><label>Nombre o entidad<input required name="nombre" autocomplete="name" placeholder="Nombre y organización"></label><label>Correo<input required name="correo" type="email" autocomplete="email" placeholder="correo@empresa.com"></label><label>¿Qué necesita resolver?<textarea required name="mensaje" rows="4" placeholder="Activo, obra, informe, licitación o decisión bloqueada"></textarea></label><button class="button button-primary" type="submit">Preparar correo de contacto</button><p class="form-note">No se envía información desde esta web. Se abrirá su cliente de correo con el borrador preparado.</p></form></section>
+    <section class="contact-section" id="contacto"><div><p class="eyebrow">Primer contacto</p><h2>Traiga el problema. Ordenamos el siguiente paso.</h2><p>No hace falta tenerlo todo resuelto. Indique qué ocurre, qué documentación existe y qué decisión necesita tomar.</p></div><form class="contact-form" data-contact-form>
+      <fieldset disabled style="border:0;padding:0;margin:0;min-width:0;display:grid;gap:12px"><legend>Consulta de contacto</legend>
+      <label>Nombre o entidad<input required name="nombre" maxlength="120" autocomplete="name" placeholder="Nombre y organización"></label>
+      <label>Correo<input required name="email" type="email" maxlength="254" autocomplete="email" placeholder="correo@empresa.com"></label>
+      <label>¿Qué necesita resolver?<textarea required name="mensaje" maxlength="4000" rows="4" placeholder="Activo, obra, informe, licitación o decisión bloqueada"></textarea></label>
+      <input name="_gotcha" type="text" hidden tabindex="-1" autocomplete="off" aria-hidden="true">
+      <label style="display:flex;align-items:center;gap:10px"><input name="privacidad" type="checkbox" required value="leida" style="width:20px;height:20px">He leído la información de privacidad.</label>
+      <button class="button button-primary" type="submit">Enviar consulta</button></fieldset>
+      <p class="form-note">Responsable: Iván Soto Barber. Finalidad: atender su consulta, por interés legítimo o medidas precontractuales según la solicitud. Proveedores: Formspree y correo, con tratamiento en Estados Unidos. Derechos: <a href="mailto:contacto@vbmconsulting.es">contacto@vbmconsulting.es</a>. <a href="privacidad.html">Información de privacidad</a></p>
+      <p class="form-note" data-contact-status role="status" aria-live="polite" aria-atomic="true">El envío desde la web no está disponible. Puede escribir al correo de contacto.</p>
+      <noscript>Para contactar sin JavaScript, utilice el enlace de correo.</noscript>
+    </form></section>
   </main>
   <footer class="site-footer"><div><strong>VB&M Ingeniería</strong><span>Veredas, Barrancos y Maretas, S.L. · sociedad en constitución</span><a href="mailto:contacto@vbmconsulting.es">contacto@vbmconsulting.es</a></div><nav><a href="#soluciones">Soluciones</a><a href="#licitaciones">Licitaciones</a><a href="bbl-automatizacion-documental.html">BBL</a><a href="casesignal-seleccion-talento.html">CaseSignal</a><a href="#contacto">Contacto</a><a href="aviso-legal.html">Aviso legal</a><a href="privacidad.html">Privacidad</a><a href="cookies.html">Cookies</a></nav><small>NIF: pendiente · Domicilio: pendiente</small></footer>
-  <script src="main.js" defer></script>
+  <script src="main.js" type="module"></script>
   <script src="modern.js" defer></script>
 </body>
 </html>

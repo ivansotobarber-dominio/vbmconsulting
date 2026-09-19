@@ -7,7 +7,7 @@ const files = [
   'casesignal-seleccion-talento.html', 'cookies.html', 'index.html',
   'ingenieria-de-caminos.html', 'privacidad.html', 'digital-products.css',
   'experience.css', 'modern.css', 'studio.css', 'styles.css',
-  'main.js', 'modern.js', 'favicon.svg', 'llms.txt', 'robots.txt',
+  'main.js', 'contact-form.mjs', 'modern.js', 'favicon.svg', 'llms.txt', 'robots.txt',
   'site.webmanifest', 'sitemap.xml', 'assets/vbm-territory-bim-v01.png',
   'assets/video/vbm-territorio-bim-loop-v01.mp4',
   'assets/video/vbm-territorio-bim-reference-v01.png',
