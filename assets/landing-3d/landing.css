@@ -1,0 +1,23 @@
+:root{color-scheme:light;--ink:#0b2021;--sea:#0c5960;--paper:#edf1ee;--focus:#ae493b}
+*{box-sizing:border-box;letter-spacing:0}
+html,body{margin:0;background:var(--paper);color:var(--ink);font-family:Arial,Helvetica,sans-serif}
+.entry{height:100svh;display:grid;grid-template-rows:auto minmax(0,1fr);gap:20px;padding:54px 24px 28px}
+.entry-heading{position:relative;text-align:center}
+h1{font:400 68px/1.1 Georgia,'Times New Roman',serif;margin:0}
+.entry-actions{display:flex;justify-content:center;align-items:center;gap:14px;margin-top:26px}
+.access{display:inline-flex;justify-content:center;align-items:center;gap:20px;min-height:48px;padding:12px 21px;border:1px solid var(--ink);border-radius:2px;font-size:13px;font-weight:600;text-decoration:none;color:var(--ink);white-space:nowrap}
+.access img{flex-shrink:0}.primary{background:var(--ink);color:white}.primary img{filter:invert(1)}
+.primary:hover{background:var(--sea);border-color:var(--sea)}.contact:hover{background:#fff}
+.access:focus-visible{outline:3px solid var(--focus);outline-offset:5px}
+.scene{min-width:0;min-height:0;position:relative}
+.object-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);height:100%;gap:12px}
+.object-space{min-width:0;min-height:0}
+.scene-fallback,.scene-fallback img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+.scene canvas{position:absolute;inset:0;display:block;width:100%;height:100%;pointer-events:none}
+.scene:not(.ready) canvas{visibility:hidden}.scene.ready .scene-fallback{display:none}
+@media(max-width:1100px){.entry{padding:36px 20px 22px;gap:14px}h1{font-size:56px}}
+@media(max-width:900px) and (orientation:portrait){.entry{padding-top:38px}.object-layout{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) minmax(0,1fr);gap:12px}}
+@media(max-width:600px){.entry{padding:30px 18px 18px;gap:14px}h1{font-size:42px}.entry-actions{gap:10px;margin-top:20px}.access{padding:11px 14px;gap:12px;font-size:12px}.object-layout{gap:4px}}
+@media(max-width:360px){.entry{padding:22px 14px 14px;gap:10px}h1{font-size:35px}.entry-actions{margin-top:16px;gap:8px}.access{padding:10px 12px;min-height:46px;gap:9px;font-size:11px}}
+@media(max-height:550px) and (orientation:landscape){.entry{padding:16px 20px 10px;gap:6px}h1{font-size:36px}.entry-actions{margin-top:12px;gap:12px}.access{min-height:44px;padding:9px 16px;font-size:12px}.object-layout{gap:18px}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
