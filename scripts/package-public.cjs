@@ -20,6 +20,8 @@ const files = [
   'assets/landing-3d/vendor/RoundedBoxGeometry.js',
   'assets/landing-3d/vendor/LICENSE',
   'assets/landing-3d/icons/arrow-up-right.svg', 'assets/landing-3d/icons/LICENSE',
+  'demos/futbol/index.html', 'demos/futbol/styles.css', 'demos/futbol/app.mjs',
+  'demos/futbol/vendor/lucide.min.js', 'demos/futbol/vendor/LICENSE-lucide',
 ];
 
 function packagePublic(destination) {
