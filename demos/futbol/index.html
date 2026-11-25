@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="color-scheme" content="light">
   <meta name="robots" content="noindex,nofollow">
+  <meta name="color-scheme" content="light">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
   <meta name="description" content="Terreno, prototipo local de preparación deportiva con datos ficticios.">
   <title>Terreno · Equipo demo</title>
@@ -20,15 +20,13 @@
     <div class="team-identity"><strong>Equipo demo</strong><span>Fútbol 11 · Adultos ficticios</span></div>
     <div class="header-end"><span class="demo-badge">DEMO PÚBLICA</span><button class="icon-button" data-action="export" title="Exportar JSON" aria-label="Exportar JSON"><i data-lucide="download"></i></button><button class="icon-button" data-action="print" title="Imprimir resumen" aria-label="Imprimir resumen"><i data-lucide="printer"></i></button></div>
   </header>
-  <div class="storage-warning" role="note">Demo pública. Solo datos ficticios. No introduzcas datos reales.</div>
+  <p class="storage-warning" role="note">Demo pública. Solo datos ficticios. No introduzcas datos reales. URL pública; noindex no restringe el acceso.</p>
   <div id="storage-warning" class="storage-warning" role="alert" hidden></div>
   <div class="workspace">
     <div class="nav-row"><nav class="tabs" role="tablist" aria-label="Vistas de preparación">
       <button id="tab-week" role="tab" aria-selected="true" aria-controls="view-panel" data-tab="week"><i data-lucide="calendar-days"></i><span>Semana</span></button>
-      <button id="tab-board" role="tab" aria-selected="false" aria-controls="view-panel" tabindex="-1" data-tab="board"><i data-lucide="waypoints"></i><span>Pizarra</span></button>
       <button id="tab-analysis" role="tab" aria-selected="false" aria-controls="view-panel" tabindex="-1" data-tab="analysis"><i data-lucide="scan-eye"></i><span>Análisis</span></button>
       <button id="tab-match" role="tab" aria-selected="false" aria-controls="view-panel" tabindex="-1" data-tab="match"><i data-lucide="flag"></i><span>Partido</span></button>
-      <button id="tab-summary" role="tab" aria-selected="false" aria-controls="view-panel" tabindex="-1" data-tab="summary"><i data-lucide="clipboard-list"></i><span>Resumen</span></button>
     </nav><span id="save-status" class="save-status" role="status">Datos de demo</span></div>
     <main id="main" tabindex="-1"><div id="view-panel" role="tabpanel" aria-labelledby="tab-week"></div></main>
     <footer class="app-footer"><span>Temporada de demo 2026/27 · Sin datos reales</span><button class="text-button" data-action="reset"><i data-lucide="rotate-ccw"></i>Restablecer demo</button></footer>

@@ -22,6 +22,10 @@ const files = [
   'assets/landing-3d/icons/arrow-up-right.svg', 'assets/landing-3d/icons/LICENSE',
   'demos/futbol/index.html', 'demos/futbol/styles.css', 'demos/futbol/app.mjs',
   'demos/futbol/vendor/lucide.min.js', 'demos/futbol/vendor/LICENSE-lucide',
+  'demos/futbol/model.mjs', 'demos/futbol/model-v3.mjs', 'demos/futbol/board.mjs',
+  'demos/futbol/board-v4.mjs', 'demos/futbol/model-v4.mjs',
+  'demos/futbol/playback-v4.mjs', 'demos/futbol/store-v4.mjs',
+  'demos/futbol/workbench-v4.mjs',
 ];
 
 function packagePublic(destination) {
