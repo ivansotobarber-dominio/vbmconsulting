@@ -5,11 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex,nofollow">
   <meta name="color-scheme" content="light">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
   <meta name="description" content="Terreno, prototipo local de preparación deportiva con datos ficticios.">
   <title>Terreno · Equipo demo</title>
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="./planning-v7.css">
+  <link rel="stylesheet" href="./analysis-v7.css">
+  <link rel="stylesheet" href="./academy-v7.css">
   <script src="./vendor/lucide.min.js" defer></script>
   <script type="module" src="./app.mjs"></script>
 </head>
@@ -18,9 +21,9 @@
   <header class="app-header">
     <div class="brand"><span class="brand-symbol" aria-hidden="true">T.</span><span>terreno<span class="brand-sub">Preparación deportiva</span></span></div><button id="home-access" class="icon-button" data-action="v6-home" title="Inicio" aria-label="Inicio"><i data-lucide="house"></i></button>
     <div class="team-identity"><strong>Equipo demo</strong><span>Fútbol 11 · Adultos ficticios</span></div>
-    <div class="header-end"><span class="demo-badge">DEMO PÚBLICA</span><button class="icon-button" data-action="export" title="Exportar JSON" aria-label="Exportar JSON"><i data-lucide="download"></i></button><button class="icon-button" data-action="print" title="Imprimir resumen" aria-label="Imprimir resumen"><i data-lucide="printer"></i></button></div>
+    <div class="header-end"><button type="button" class="demo-badge" popovertarget="public-demo-notice" aria-controls="public-demo-notice" title="Aviso de la demo pública">DEMO PÚBLICA · Solo ficticios</button><button class="icon-button" data-action="export" title="Exportar JSON del equipo" aria-label="Exportar JSON del equipo"><i data-lucide="download"></i></button><button class="icon-button" data-action="print" title="Imprimir resumen" aria-label="Imprimir resumen"><i data-lucide="printer"></i></button></div>
   </header>
-  <p class="storage-warning" role="note">BETA pública. Solo datos ficticios. Esta URL no es privada ni tiene control de acceso. No introduzcan datos reales. El alojamiento puede conservar registros técnicos.</p>
+  <div id="public-demo-notice" popover class="storage-warning" role="dialog" aria-labelledby="public-demo-notice-title"><div class="dialog-heading"><h2 id="public-demo-notice-title">Aviso de la demo pública</h2><button type="button" class="icon-button" popovertarget="public-demo-notice" popovertargetaction="hide" aria-label="Cerrar aviso público" title="Cerrar aviso público"><i data-lucide="x"></i></button></div><p role="note">BETA pública. Solo datos ficticios. Esta URL no es privada ni tiene control de acceso. No introduzcan datos reales. El alojamiento puede conservar registros técnicos.</p></div>
   <div id="storage-warning" class="storage-warning" role="alert" hidden></div>
   <div class="workspace">
     <div class="nav-row"><nav class="tabs" role="tablist" aria-label="Vistas de preparación">
@@ -31,7 +34,7 @@
       <button id="tab-academy" role="tab" aria-selected="false" aria-controls="view-panel" tabindex="-1" data-tab="academy"><i data-lucide="school"></i><span>Academia</span></button>
     </nav><span id="save-status" class="save-status" role="status">Datos de demo</span></div>
     <main id="main" tabindex="-1"><div id="view-panel" role="tabpanel" aria-labelledby="tab-week"></div></main>
-    <footer class="app-footer"><span>Temporada de demo 2026/27 · Sin datos reales</span><button class="text-button" data-action="reset"><i data-lucide="rotate-ccw"></i>Restablecer demo</button></footer>
+    <footer class="app-footer"><span>Temporada de demo 2026/27 · Sin datos reales</span><button class="text-button" data-action="reset"><i data-lucide="rotate-ccw"></i>Restablecer equipo</button></footer>
   </div>
   <div id="notice" class="notice" role="status" aria-live="polite" hidden></div>
   <dialog id="session-dialog" aria-labelledby="session-dialog-title">

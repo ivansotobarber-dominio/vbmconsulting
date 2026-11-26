@@ -1,16 +1,20 @@
 import {V1KEY,ANCHOR,PHASES,BOARDS,addDays,monday,parseV1,parseV2,migrate,readPhoto} from './model.mjs';
 import {KEY as V3KEY,V2KEY,NUMBERS,TEXTS,enrichTask,parseV3,migrateV2} from './model-v3.mjs';
-import {KINDS,planDefaults,newBoard,upgradeBoard,migrateV3,parseV4,cloneBoard,snapshot,mdLabel,LOADS} from './model-v4.mjs';
+import {KINDS,planDefaults,migrateV3,parseV4,mdLabel,LOADS} from './model-v4.mjs';
 import {KEY as V5KEY,V4KEY,parseV5,migrateV4} from './model-v5.mjs';
-import {KEY,parseV6,migrateV5,cloneExercise,duplicateWeek} from './model-v6.mjs';
-import {libraryDefaults,newExercise,copyToSession,objectiveLabels} from './library-controller-v6.mjs';
+import {parseV6,migrateV5} from './model-v6.mjs';
+import {KEY,V6KEY,parseV7,migrateV6,newBoard7 as newBoard,upgradeBoard7 as upgradeBoard,cloneBoard7 as cloneBoard,snapshot7 as snapshot,cloneExercise7 as cloneExercise,duplicateWeek7 as duplicateWeek,copyToSession7 as copyToSession,loadDefaults} from './model-v7.mjs';
+import {libraryDefaults,newExercise,objectiveLabels} from './library-controller-v6.mjs';
 import {libraryView,libraryResults,tagFields} from './library-view-v6.mjs';
-import {createAnimation} from './animation-v6.mjs';
+import {createPlayback7} from './playback-v7.mjs';
+import {boardSVG7 as boardSVG,objectSVG7 as objectSVG,boardEditor7,phaseToolbar7,phaseQuickToolbar7,inspector7 as inspector} from './board-v7.mjs';
+import {manualLoadForm,loadForm,weekComparison,categoryBadge,seasonCalendar} from './planning-v7.mjs';
+import {analysisTools7,presentation7,presentationBlocks7} from './analysis-v7.mjs';
 import {renderRoster,rosterSummary,minimalWeekSummary} from './roster-view-v5.mjs';
 import {rosterDefaults,submitRoster,rosterAction} from './roster-controller-v5.mjs';
 import {LocalStoreV4} from './store-v4.mjs';
 import {weekNavigation,microcycleToolbar,planForm,renderSeason,renderIndividual,renderNutrition,renderProblems,variantTools,variantDetails,frameToolbar,formCandidate} from './workbench-v4.mjs';
-import {boardItems,itemKind,itemName,objectSVG,boardSVG,boardEditor as baseBoardEditor,inspector} from './board-v4.mjs';
+import {boardItems,itemKind,itemName} from './board-v4.mjs';
 const DAYS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
 const SHORT = ['LUN', 'MAR', 'MIÉ', 'JUE', 'VIE', 'SÁB', 'DOM'];
 const PLAYERS = Array.from({ length: 18 }, (_, i) => ({ id: `p${i + 1}`, name: `Jugador ${String(i + 1).padStart(2, '0')}` }));
@@ -87,20 +91,21 @@ let expectedRaw = null;
 let migrationRaw = null;
 let migrationSources = {};
 let needsInitialSave = false;
-const clean = s => parseV6(s,LIBRARY,FORMATIONS);
+const clean = s => parseV7(s,LIBRARY,FORMATIONS);
 const validate = s => {try {clean(s);return true;}catch{return false;}};
 function fresh() {
-  return migrateV5(migrateV4(migrateV3(migrateV2(migrate(seed(),PLAYERS),ownLibrary()))));
+  return migrateV6(migrateV5(migrateV4(migrateV3(migrateV2(migrate(seed(),PLAYERS),ownLibrary())))));
 }
 function ownLibrary(){
   return LIBRARY.map(t=>({...enrichTask({id:t.id,libraryId:t.id,title:t.title,duration:t.duration,objective:t.objective}),participants:8,jokers:2,length:30,width:25,type:t.category,part:'Principal',attackObjective:'Crear apoyos y líneas de pase.',defendObjective:'Cerrar espacios y coordinar la recuperación.',description:'Ejercicio sintético de preparación colectiva con oposición y apoyos.',variants:'Variar el espacio o limitar los contactos.',board:{pieces:Array.from({length:8},(_,i)=>({id:uid(),kind:'player',label:String(i+1),x:25+(i%4)*16,y:30+Math.floor(i/4)*35,team:i<3?'A':i<6?'B':'wildcard'})),arrows:[],zones:[],text:'Organización ficticia editable.'}}));
 }
 const store=new LocalStoreV4({key:KEY,parse:clean,seed:fresh,legacy:[
-  {key:V5KEY,convert:s=>migrateV5(parseV5(s,LIBRARY,FORMATIONS))},
-  {key:V4KEY,convert:s=>migrateV5(migrateV4(parseV4(s,LIBRARY,FORMATIONS)))},
-  {key:V3KEY,convert:s=>migrateV5(migrateV4(migrateV3(parseV3(s,LIBRARY,FORMATIONS))))},
-  {key:V2KEY,convert:s=>migrateV5(migrateV4(migrateV3(migrateV2(parseV2(s,LIBRARY,FORMATIONS),ownLibrary()))))},
-  {key:V1KEY,convert:s=>migrateV5(migrateV4(migrateV3(migrateV2(migrate(parseV1(s,LIBRARY,FORMATIONS,PLAYERS),PLAYERS),ownLibrary()))))},
+  {key:V6KEY,convert:s=>migrateV6(parseV6(s,LIBRARY,FORMATIONS))},
+  {key:V5KEY,convert:s=>migrateV6(migrateV5(parseV5(s,LIBRARY,FORMATIONS)))},
+  {key:V4KEY,convert:s=>migrateV6(migrateV5(migrateV4(parseV4(s,LIBRARY,FORMATIONS))))},
+  {key:V3KEY,convert:s=>migrateV6(migrateV5(migrateV4(migrateV3(parseV3(s,LIBRARY,FORMATIONS)))))},
+  {key:V2KEY,convert:s=>migrateV6(migrateV5(migrateV4(migrateV3(migrateV2(parseV2(s,LIBRARY,FORMATIONS),ownLibrary())))))},
+  {key:V1KEY,convert:s=>migrateV6(migrateV5(migrateV4(migrateV3(migrateV2(migrate(parseV1(s,LIBRARY,FORMATIONS,PLAYERS),PLAYERS),ownLibrary())))))},
 ]});
 function syncStore(){storageBlocked=store.blocked;if(store.message)storageMessage=store.message;expectedRaw=store.raw;migrationSources=store.sources;needsInitialSave=store.needsSave;}
 function load(){const value=store.read();syncStore();return value;}
@@ -119,7 +124,8 @@ const rosterUi=rosterDefaults(state);
 const motion=matchMedia('(prefers-reduced-motion: reduce)');
 const libraryUi=libraryDefaults();
 let homeReturn=null;
-const playback=createAnimation({draw:drawPreview,restore:()=>drawPreview(currentBoard()),status:previewStatus});
+const playback=createPlayback7({draw:drawPreview,restore:()=>drawPreview(currentBoard()),status:previewStatus,renderSVG:b=>boardSVG(b,pitchLines),videoStatus:message=>{const node=$('#v7-video-status');if(node)node.textContent=message;}});
+let academyController=null,academyModule=null,academyMountToken=0,presentationIndex=0,presentationPrint=false;
 let photoBusy = false;
 let dirty = false;
 const dirtyForms = new Set();
@@ -127,10 +133,12 @@ const formBaselines = new Map();
 let analysisReturn = null;
 const formNames={'session-edit':'Sesión','exercise-form':'Ejercicio','analysis-form':'Análisis','match-form':'Once','board-form':'Consigna','person-form':'Ficha','new-session-form':'Nueva sesión','v4-plan-session':'Planificación de sesión','v4-plan-exercise':'Planificación de ejercicio','v4-fixture':'Partido de referencia','v4-phase':'Fase','v4-season':'Temporada','v4-record':'Registro ficticio','v4-nutrition':'Pauta ficticia','v4-problem':'Problema','v4-partitions':'Banquillo y consignas'};
 Object.assign(formNames,{'v5-profile':'Datos deportivos','v5-season':'Temporada deportiva','v5-competition':'Competición','v5-session-season':'Atribución de sesión','v5-stat':'Estadística de partido','v5-rule':'Nueva versión de regla','v5-sanction':'Sanción manual'});
+Object.assign(formNames,{'v7-load-form':'Volumen e índice DEMO','v7-categories':'Categorías manuales','v7-analysis-form':'Plan prepartido','v7-phase-form':'Nombre de fase'});
+const coreForms=()=>$$('form').filter(form=>!form.closest('.academy-v7'));
 function formSignature(form){return JSON.stringify([...form.elements].filter(f=>['INPUT','TEXTAREA','SELECT'].includes(f.tagName)&&!['submit','button','reset','image'].includes(f.type)).map((f,i)=>[f.id||f.name||i,f.type==='file'?[...f.files].map(v=>[v.name,v.size,v.type,v.lastModified]):['checkbox','radio'].includes(f.type)?f.checked:f.multiple?[...f.selectedOptions].map(o=>o.value):f.value,Boolean(f.validity?.badInput)]));}
 function refreshDirty(){
   dirtyForms.clear();
-  for(const form of $$('form')){
+  for(const form of coreForms()){
     if(!formBaselines.has(form.id))formBaselines.set(form.id,formSignature(form));
     const changed=formSignature(form)!==formBaselines.get(form.id);
     if(changed)dirtyForms.add(form.id);
@@ -140,7 +148,7 @@ function refreshDirty(){
 }
 function baselineForms(){
   formBaselines.clear();dirtyForms.clear();dirty=false;
-  for(const form of $$('form')){
+  for(const form of coreForms()){
     form.querySelector('.form-dirty')?.remove();
     const marker=document.createElement('p');marker.id=`pending-${form.id}`;marker.className='form-dirty';marker.hidden=true;marker.setAttribute('role','status');marker.textContent=`${formNames[form.id]??'Formulario'}: cambios sin guardar`;
     form.prepend(marker);form.setAttribute('aria-describedby',[...(form.getAttribute('aria-describedby')??'').split(' ').filter(id=>id&&id!==marker.id),marker.id].join(' '));formBaselines.set(form.id,formSignature(form));
@@ -169,7 +177,7 @@ function storageUI() {
   $('#storage-warning').hidden = !storageMessage;
   $('#storage-warning').textContent = storageMessage;
   const pending=dirty?`${dirtyForms.size} ${dirtyForms.size===1?'formulario pendiente':'formularios pendientes'} · `:'';
-  const status=pending+(storageBlocked?'Sin guardar · solo en memoria':`${dirty?'Último guardado local':'Guardado local'} · ${new Date(state.updatedAt).toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'})}`);
+  const status=pending+(storageBlocked?'Equipo sin guardar · solo en memoria':store.needsSave?'Equipo en memoria · pendiente de guardado explícito':`${dirty?'Último guardado del equipo':'Equipo guardado localmente'} · ${new Date(state.updatedAt).toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'})}`);
   if($('#save-status').textContent!==status)$('#save-status').textContent=status;
 }
 function save(message) {
@@ -180,10 +188,11 @@ function save(message) {
 }
 function canLeave() {
   if(photoBusy){notify('Espera a que termine la validación de la foto.',true);return false;}
+  if(academyController&&!academyController.canLeave())return false;
   refreshDirty();
   if (!dirty) return true;
   if (!window.confirm('Hay cambios de formulario sin guardar. ¿Descartarlos y continuar?')) return false;
-  for(const form of $$('form'))if(dirtyForms.has(form.id))HTMLFormElement.prototype.reset.call(form);
+  for(const form of coreForms())if(dirtyForms.has(form.id))HTMLFormElement.prototype.reset.call(form);
   refreshDirty();return true;
 }
 function focusElement(selector) { $(selector)?.focus(); }
@@ -202,6 +211,10 @@ function heading(title, subtitle, actions = '') {
   return `<div class="view-heading"><div><p class="eyebrow">Terreno · ${esc(monday(state.activeDate))}</p><h1 tabindex="-1">${title}</h1><p>${subtitle}</p></div><div class="heading-actions">${actions}${view!=='summary'?`<button class="icon-button secondary" data-action="summary" title="Resumen del contexto" aria-label="Resumen del contexto">${icon('clipboard-list')}</button>`:''}</div></div>`;
 }
 function render(preview=false) {
+  const enteringBoard=view==='board'&&document.body.dataset.view!=='board',openBoardDetails=$$('.v7-tactical-workspace details[open]').map(n=>n.id),oldBoardContext=ui4.boardContext;
+  if(view==='academy'&&academyController)return;
+  if(academyController){academyController.destroy();academyController=null;}
+  academyMountToken++;
   if(!preview)playback.stop();
   if(view==='week'||view==='library'){const tasks=exerciseOwner==='library'?state.library:currentSession()?.tasks??[];if(!tasks.some(t=>t.id===selectedExerciseId))selectedExerciseId=tasks[0]?.id??null;}
   if(analysisReturn&&view==='week'&&(ui4.weekMode!=='microcycle'||selectedExerciseId!==analysisReturn.targetId||exerciseOwner!==analysisReturn.targetOwner))analysisReturn=null;
@@ -211,15 +224,29 @@ function render(preview=false) {
   $$('[data-tab]').forEach(tab => { const active = view!=='home'&&tab.dataset.tab === section; tab.setAttribute('aria-selected', String(active)); tab.tabIndex = tab.dataset.tab===section ? 0 : -1; });
   $('#view-panel').setAttribute('aria-labelledby',view==='home'?'home-access':`tab-${section}`);
   $('#view-panel').setAttribute('role',view==='home'?'region':'tabpanel');
-  $('#view-panel').innerHTML = ({home:renderHome,library:()=>libraryView(state,libraryUi,selectedExerciseId)+exerciseEditor(currentExercise()),week:renderWeek,board:renderBoard,analysis:renderAnalysis,match:renderMatch,summary:renderSummary,roster:()=>renderRoster(state,rosterUi,ui4,personEditor('player')),academy:()=>'<section class="v4-section"><h1 tabindex="-1">Academia</h1><p role="status">No conectada</p><p>Arquitectura propuesta. Sin cuentas, organizaciones operativas o sincronización.</p></section>'})[view]();
+  $('#view-panel').innerHTML = ({home:renderHome,library:()=>libraryView(state,libraryUi,selectedExerciseId)+exerciseEditor(currentExercise()),week:renderWeek,board:renderBoard,analysis:renderAnalysis,match:renderMatch,summary:renderSummary,presentation:()=>presentation7(state,presentationIndex,presentationPrint),roster:()=>renderRoster(state,rosterUi,ui4,personEditor('player')),academy:()=>'<section class="academy-v7" id="academy-v7-root"><h1 tabindex="-1">Academia</h1><p role="status">Cargando demo local…</p></section>'})[view]();
+  if(view==='academy')mountAcademyView();
   const exerciseForm=$('#exercise-form');if(exerciseForm)exerciseForm.querySelector('.form-footer').insertAdjacentHTML('beforebegin',tagFields(currentExercise()));
   if(view==='library')$('#exercise-form')?.insertAdjacentHTML('beforebegin','<h3 tabindex="-1" id="v6-selected-title">Ejercicio seleccionado</h3>');
   const frames=$('#v4-frame');if(frames)for(const [i,option]of [...frames.options].entries())if(i>0)option.textContent=`Paso ${i} · ${option.textContent}`;
   if(view==='summary'&&!ui4.framePrint){const node=$('#print-summary');if(section==='analysis')node.insertAdjacentHTML('beforeend',`<div class="summary-v4">${renderProblems(state,ui4)}</div>`);if(section==='match')node.insertAdjacentHTML('beforeend',matchSummaryExtras());if(section==='week'&&ui4.weekMode==='microcycle'){const exercises=exerciseSummaryOnly||exerciseOwner==='library'?[currentExercise()].filter(Boolean):state.sessions.filter(s=>s.date>=monday(state.activeDate)&&s.date<=addDays(monday(state.activeDate),6)).flatMap(s=>s.tasks);node.insertAdjacentHTML('beforeend',`<section class="summary-section"><h2>Objetivos de ejercicios</h2>${exercises.map(t=>summaryText(t.title,objectiveLabels(t))).join('')}</section>`);}}
+  if(view==='week'&&ui4.weekMode==='microcycle'){
+    $('.calendar-toolbar .segmented')?.insertAdjacentHTML('beforeend','<button data-action="v7-calendar-season" aria-pressed="false">Temporada</button>');
+    for(const day of $$('[data-action="day"]')){day.insertAdjacentHTML('beforeend',categoryBadge(state,day.dataset.date));const sessions=state.sessions.filter(s=>s.date===day.dataset.date),pending=sessions.some(s=>s.tasks.some(t=>t.duration===null)),label=day.querySelector('.day-load');if(label&&sessions.length)label.textContent=`${sessions.reduce((n,s)=>n+minutes(s),0)} min previstos${pending?' parciales':''}`;}
+    $('.calendar-toolbar')?.insertAdjacentHTML('afterend',manualLoadForm(state)+weekComparison(state));
+    if(currentSession())$('.session-workspace')?.insertAdjacentHTML('beforeend',loadForm(currentSession()));
+  }
+  if(view==='week'&&ui4.weekMode==='season')$('#view-panel').insertAdjacentHTML('beforeend',seasonCalendar(state));
   if(view==='week')for(const s of state.sessions){const node=$(`[data-action="session"][data-id="${CSS.escape(s.id)}"] small`);if(node)node.textContent=`${s.tasks.length} ejercicios · ${volume(s)}`;}
   if(analysisReturn&&view==='week'&&$('.exercise-sheet'))$('.exercise-sheet').insertAdjacentHTML('afterbegin',`<div class="context-return"><button class="secondary" data-action="return-analysis" title="Volver al análisis de origen">${icon('arrow-left')}Volver al análisis</button></div>`);
   for(const link of $$('[data-action="open-exercise-link"]')){const target=exerciseTarget(state.problems.find(p=>p.id===link.dataset.id)?.exerciseId);link.disabled=!target;link.title=target?`Ir al ejercicio: ${target.exercise.title}`:'Ejercicio no disponible';}
-  baselineForms();icons();storageUI();
+  if(oldBoardContext===ui4.boardContext)for(const id of openBoardDetails){const node=document.getElementById(id);if(node)node.open=true;}
+  baselineForms();icons();storageUI();if(enteringBoard)window.scrollTo(0,0);
+}
+async function mountAcademyView(){
+  const token=academyMountToken,node=$('#academy-v7-root');
+  try{academyModule??=await import('./academy-v7.mjs');if(token!==academyMountToken||view!=='academy'||!node.isConnected)return;academyController=academyModule.mountAcademy(node,{notify,icons,onDirtyChange:()=>storageUI(),requestNavigate:destination=>changeView(destination,true)});icons();}
+  catch(error){if(token===academyMountToken&&node.isConnected){node.querySelector('[role=status]').textContent='Academia pendiente de integración local. No se ha conectado ningún servicio.';notify(error.message,true);}}
 }
 function renderHome(){
   const sessions=state.sessions.filter(s=>s.date===state.activeDate),fixtures=state.fixtures.filter(f=>f.date===state.activeDate);
@@ -227,8 +254,8 @@ function renderHome(){
   return `<section class="home-work"><div class="view-heading"><div><p class="eyebrow">Equipo demo · Adultos ficticios</p><h1 tabindex="-1">Inicio</h1><p>Contexto elegido · ${esc(state.activeDate)}</p></div><button class="primary" data-action="v6-continue">${icon('arrow-right')}Continuar trabajo</button></div><div class="home-shortcuts">${link('week','Planificación','calendar-days')}${link('analysis','Análisis','scan-eye')}${link('match','Partido','flag')}${link('roster','Plantilla','users')}${link('academy','Academia · No conectada','school')}<button class="secondary" data-action="library">${icon('library')}Biblioteca local</button></div><section class="home-agenda"><div class="section-heading"><h2>Sesiones · ${esc(state.activeDate)}</h2><button class="secondary" data-action="new-session">${icon('plus')}Nueva sesión</button></div>${sessions.map(s=>`<div class="home-row"><button class="session-choice" data-action="v6-open-session" data-id="${esc(s.id)}"><strong>${esc(s.title)}</strong><small>${volume(s)}</small></button><button class="icon-button secondary" data-action="v6-open-general" data-id="${esc(s.id)}" title="Pizarra general de ${esc(s.title)}" aria-label="Pizarra general de ${esc(s.title)}">${icon('waypoints')}</button></div>`).join('')||'<p>Sin sesiones en la fecha elegida.</p>'}<button class="text-button" data-action="v6-goto" data-destination="week">${icon('calendar')}Abrir calendario</button></section><section class="home-agenda"><h2>Partidos de referencia · ${esc(state.activeDate)}</h2>${fixtures.map(f=>`<p>${esc(f.title)} · ${esc(f.date)}</p>`).join('')||'<p>Sin partidos de referencia en esta fecha.</p>'}</section></section>`;
 }
 function drawPreview(board){
-  const target=$('#pieces'),svg=$('#pitch');if(!target||!svg||!board)return;
-  target.innerHTML=[...board.zones,...board.arrows,...board.pieces].map(p=>objectSVG(p,p.id===selectedPieceId,svg.dataset.marker,true)).join('');
+  const svg=$('#pitch');if(!svg||!board)return;
+  svg.outerHTML=boardSVG(board,pitchLines,selectedPieceId,true);
 }
 function previewStatus(mode,detail){
   const button=$('[data-action="v4-play"]'),label=mode==='playing'?'Pausar vista previa':mode==='paused'?'Reanudar vista previa':'Reproducir pasos';
@@ -251,7 +278,7 @@ function renderWeek(){
   const content=ui4.weekMode==='season'?renderSeason(state,ui4):ui4.weekMode==='individual'?renderIndividual(state,ui4):ui4.weekMode==='nutrition'?renderNutrition(state,ui4):microcycleToolbar(state,ui4)+(exerciseOwner==='library'&&!currentSession()?heading('Biblioteca propia','Ejercicios ficticios')+sessionEditor(null):renderWeekBase());
   return weekNavigation(ui4)+content;
 }
-function boardEditor(board,lines,id){const root=currentBoardRoot();return frameToolbar(root,ui4,motion.matches,playback.playing)+`<div class="preview-state"><button type="button" class="icon-button secondary" data-action="v6-stop" title="Detener y restaurar seleccionado" aria-label="Detener y restaurar seleccionado">${icon('square')}</button><p id="v6-preview-status" role="status">Seleccionado: ${ui4.frameIndex<0?'Base':`Paso ${ui4.frameIndex+1}`}</p></div>`+baseBoardEditor(currentBoard(),lines,id);}
+function boardEditor(board,lines,id){const root=currentBoardRoot();return boardEditor7(currentBoard(),lines,id,phaseToolbar7(root,ui4,motion.matches,playback.playing),phaseQuickToolbar7(root,ui4,motion.matches,playback.playing));}
 function sessionEditorV2(s) {
   return `<form id="session-edit" class="session-form"><div><label for="session-title">Sesión</label><input id="session-title" name="title" value="${esc(s.title)}" maxlength="80" required></div><div class="minutes-total">${minutes(s)} <span>min previstos</span></div><div><label for="session-date">Fecha${s.date===null?' · Sin fecha':''}</label><input id="session-date" name="date" type="date" min="1900-01-01" max="2100-12-31" value="${s.date??''}"></div><div><label for="session-intensity">Intensidad prevista (opcional 1–10)</label><input id="session-intensity" name="intensity" type="number" min="1" max="10" step="1" value="${s.intensity??''}"></div><div class="objective-field"><label for="session-objective">Objetivo colectivo</label><textarea id="session-objective" name="objective" maxlength="500" rows="2">${esc(s.objective)}</textarea><fieldset class="called"><legend>Convocados ficticios (${s.called.length})</legend>${state.players.map(p=>`<label><input type="checkbox" name="called" value="${esc(p.id)}" ${s.called.includes(p.id)?'checked':''}>${esc(p.name)}</label>`).join('')}</fieldset></div><div class="form-actions"><button type="button" class="text-button danger" data-action="delete-session">${icon('trash-2')}Eliminar sesión</button><button type="button" class="secondary" data-action="open-board">${icon('waypoints')}Pizarra</button><button class="secondary" type="submit">${icon('check')}Guardar sesión</button></div></form><div class="section-heading"><h2>Tareas <span class="count">/ ${s.tasks.length}</span></h2><button class="secondary" data-action="library">${icon('plus')}Añadir tarea</button></div>${s.tasks.length ? `<ol class="task-list">${s.tasks.map((t,i) => `<li class="task-item" data-task="${esc(t.id)}"><span class="task-number">${String(i+1).padStart(2,'0')}</span><div class="task-main"><h3>${esc(t.title)}</h3><small>${esc(LIBRARY.find(l => l.id === t.libraryId).category)}</small><label for="objective-${esc(t.id)}">Objetivo de la tarea</label><textarea id="objective-${esc(t.id)}" class="task-objective" data-task-field="objective" data-id="${esc(t.id)}" maxlength="500" rows="2">${esc(t.objective)}</textarea></div><div class="duration-field"><label for="duration-${esc(t.id)}">Minutos</label><input id="duration-${esc(t.id)}" type="number" min="1" max="180" step="1" value="${t.duration}" data-task-field="duration" data-id="${esc(t.id)}"></div><button class="icon-button danger" data-action="delete-task" data-id="${esc(t.id)}" title="Eliminar tarea" aria-label="Eliminar ${esc(t.title)}">${icon('trash-2')}</button></li>`).join('')}</ol>` : '<div class="empty-state"><h3>Sesión sin tareas</h3><button class="secondary" data-action="library">Abrir biblioteca</button></div>'}`;
 }
@@ -342,7 +369,7 @@ function miniPitch(formation, lineup) {
   const positions=FORMATIONS[formation],cells=lineupNameCells(positions);
   return `<svg class="mini-pitch" viewBox="0 0 900 580" role="img" aria-label="Alineación ${esc(formation)}">${pitchLines()}${positions.map(([x,y],i) => {const p=state.players.find(p=>p.id===lineup[i]);return `<g transform="translate(${x*9},${y*5.8})"><title>${esc(p?.name??'')}</title>${p?.photo?`<image href="${esc(p.photo)}" x="-20" y="-20" width="40" height="40"/>`:'<circle r="19" fill="#fff"/>'}<text text-anchor="middle" dominant-baseline="central" fill="#173f2d" font-size="16" font-family="Arial" font-weight="700">${p?.dorsal??i+1}</text>${lineupName(p?.name??'',x*9,y*5.8,cells[i])}</g>`;}).join('')}</svg>`;
 }
-function renderAnalysis(){return renderAnalysisBase()+renderProblems(state,ui4);}
+function renderAnalysis(){return renderAnalysisBase()+analysisTools7(state,FORMATIONS)+renderProblems(state,ui4);}
 function renderMatchBase() {
   return heading('Plan de partido', 'Equipo demo · Once y situaciones') + `<form id="match-form"><div class="formation-row"><label for="formation">Formación</label><select id="formation" name="formation">${Object.keys(FORMATIONS).map(f => `<option ${currentMatch().formation === f ? 'selected' : ''}>${f}</option>`).join('')}</select></div><div class="match-layout"><section class="match-lineup"><div id="formation-preview">${miniPitch(currentMatch().formation,currentMatch().lineup)}</div><h2>Once inicial</h2><div class="lineup-list">${currentMatch().lineup.map((id,i)=>`<div class="lineup-slot"><label for="slot-${i}">${i===0?'POR':i+1}</label><select id="slot-${i}" name="slot-${i}">${state.players.map(p=>`<option value="${esc(p.id)}" ${p.id===id?'selected':''}>${p.dorsal} · ${esc(p.name)}</option>`).join('')}</select></div>`).join('')}</div></section><section><h2>Situaciones de partido</h2><div class="board-menu">${Object.entries(BOARDS).map(([k,v])=>`<button type="button" class="secondary" data-action="match-board" data-board="${k}">${icon('waypoints')}${v}</button>`).join('')}</div><details class="legacy-notes"><summary>Notas anteriores</summary>${[['attacking','Con balón'],['defending','Sin balón'],['setPieces','Balón parado']].map(([k,label])=>summaryText(label,state.match[k])).join('')}</details></section></div><div class="form-footer"><p id="match-error" class="form-error" role="alert"></p><button class="primary" type="submit">${icon('check')}Guardar partido</button></div></form><section class="roster-section"><h2>Plantilla sintética</h2><label for="player-edit">Jugador</label><select id="player-edit">${state.players.map(p=>`<option value="${esc(p.id)}" ${p.id===selectedPlayerId?'selected':''}>${p.dorsal} · ${esc(p.name)}</option>`).join('')}</select>${personEditor('player')}</section>`;
 }
@@ -380,7 +407,7 @@ function matchSummaryExtras(){
 }
 function renderSummary(){
   if(section==='roster')return heading('Resumen compartible','DEMO FICTICIA',`<button class="secondary" data-action="back">${icon('arrow-left')}Volver</button><button class="secondary" data-action="print">${icon('printer')}Imprimir</button>`)+`<article id="print-summary">${rosterSummary(state,rosterUi)}</article>`;
-  if(section==='academy')return heading('Academia','No conectada',`<button class="secondary" data-action="back">${icon('arrow-left')}Volver</button>`)+'<article id="print-summary"><p>Academia no conectada. Arquitectura propuesta, sin servicios operativos.</p></article>';
+  if(section==='academy')return heading('Academia','Demostración local separada',`<button class="secondary" data-action="back">${icon('arrow-left')}Volver</button>`)+'<article id="print-summary"><p>Academia mantiene sus propios datos ficticios y exportación JSON. Sin servicios externos.</p></article>';
   if(section==='week'&&['individual','nutrition'].includes(ui4.weekMode))return heading('Resumen compartible','DEMO FICTICIA',`<button class="secondary" data-action="back">${icon('arrow-left')}Volver</button><button class="secondary" data-action="print">${icon('printer')}Imprimir</button>`)+`<article id="print-summary">${minimalWeekSummary(state,ui4.weekMode)}</article>`;
   if(ui4.framePrint)return heading('Cuadro táctico',esc(ui4.framePrint.title),`<button class="secondary" data-action="back">${icon('arrow-left')}Volver</button><button class="secondary" data-action="print">${icon('printer')}Imprimir</button>`)+`<article id="print-summary">${boardSummary({...newBoard(),...ui4.framePrint.board},ui4.framePrint.title)}</article>`;
   if(section==='week'&&ui4.weekMode!=='microcycle')return heading('Resumen local','Datos ficticios',`<button class="secondary" data-action="back">${icon('arrow-left')}Volver</button><button class="secondary" data-action="print">${icon('printer')}Imprimir</button>`)+`<article id="print-summary" class="summary-v4">${ui4.weekMode==='season'?renderSeason(state,ui4):ui4.weekMode==='individual'?renderIndividual(state,ui4):renderNutrition(state,ui4)}</article>`;
@@ -394,11 +421,11 @@ function selectDate(date) {
 }
 function exportData() {
   refreshDirty();
-  const drafts=dirty?$$('#view-panel form').map(f=>({form:f.id,fields:[...new FormData(f)].filter(([,v])=>typeof v==='string')})):[];
-  const payload = {product:'Terreno',demo:true,notice:'Respaldo completo: incluye registros, notas y pautas FICTICIOS y puede incluir borradores no guardados.',exportedAt:new Date().toISOString(),state:clean(state),drafts};
+  const drafts=dirty?coreForms().filter(f=>f.closest('#view-panel')).map(f=>({form:f.id,fields:[...new FormData(f)].filter(([,v])=>typeof v==='string')})):[];
+  const payload = {product:'Terreno Equipo',demo:true,notice:'Respaldo del equipo: incluye registros, notas y pautas FICTICIOS y puede incluir borradores no guardados. NO incluye Academia, que requiere su propio JSON.',exportedAt:new Date().toISOString(),state:clean(state),drafts};
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type:'application/json;charset=utf-8' });
-  const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'terreno-demo-v6.json'; a.click();
-  setTimeout(() => URL.revokeObjectURL(url), 1500); notify('Respaldo JSON con registros y pautas FICTICIOS; puede incluir borradores no guardados.');
+  const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'terreno-equipo-demo-v7.json'; a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1500); notify('JSON del equipo, con datos y borradores ficticios. Academia requiere su propio JSON.');
 }
 function movePiece(dx,dy) {
   const p = currentPiece(); if (!p) return;
@@ -420,7 +447,7 @@ function updatePiece(){
   const p=currentPiece();if(!p)return;const svg=$('#pitch');if(!svg)return;
   $$('[data-piece]',svg).forEach(g=>{g.classList.toggle('is-selected',g.dataset.piece===p.id);g.setAttribute('aria-pressed',String(g.dataset.piece===p.id));});
   const g=$(`[data-piece="${CSS.escape(p.id)}"]`,svg);
-  if(g){const fragment=document.createElementNS('http://www.w3.org/2000/svg','svg');fragment.innerHTML=objectSVG(p,true,svg.dataset.marker);const parsed=fragment.firstElementChild;for(const a of [...parsed.attributes])g.setAttribute(a.name,a.value);g.replaceChildren(...parsed.childNodes);}
+  if(g){const fragment=document.createElementNS('http://www.w3.org/2000/svg','svg');fragment.innerHTML=objectSVG(p,true,svg.dataset.marker,true,currentBoard().palette);const parsed=fragment.firstElementChild;for(const a of [...parsed.attributes])g.setAttribute(a.name,a.value);g.replaceChildren(...parsed.childNodes);}
   const pane=$('#board-inspector');
   if(pane.dataset.selected!==p.id||Boolean($('#arrow-curve')?.checked)!==Boolean(p.curve)){
     pane.innerHTML=inspector(currentBoard(),p);pane.dataset.selected=p.id;icons();
@@ -444,7 +471,7 @@ function exportFrame(){
   const blob=new Blob([new XMLSerializer().serializeToString(svg)],{type:'image/svg+xml;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`terreno-cuadro-${ui4.frameIndex<0?'base':ui4.frameIndex+1}.svg`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1500);notify(`SVG del cuadro ${name}, sin vídeo.`);
 }
 function v4Action(action,b){
-  if(action==='v4-play'){if(playback.playing)playback.pause();else if(!motion.matches&&currentBoardRoot()?.frames.length&&canLeave())playback.play(currentBoardRoot().frames.map(f=>f.snapshot));return true;}
+  if(action==='v4-play'){if(playback.playing)playback.pause();else if(!motion.matches&&currentBoardRoot()?.frames.length&&canLeave())playback.play([snapshot(currentBoardRoot()),...currentBoardRoot().frames.map(f=>f.snapshot)]);return true;}
   if(!action.startsWith('v4-'))return false;
   playback.stop();
   if(action==='v4-export-svg'){exportFrame();return true;}
@@ -494,12 +521,33 @@ function returnToAnalysis(){
   const origin=analysisReturn;analysisReturn=null;playback.stop();state.activeDate=origin.activeDate;state.selectedSessionId=state.sessions.find(s=>s.id===origin.sessionId&&s.date===origin.activeDate)?.id??null;exerciseOwner=origin.owner;selectedExerciseId=origin.exerciseId;period=origin.period;selectedRivalId=origin.rivalId;Object.assign(ui4,origin.ui);section=view='analysis';boardKey=null;selectedPieceId=null;render();
   const focus=$(`[data-action="open-exercise-link"][data-id="${CSS.escape(origin.problemId)}"]`)??$('#v4-problemText');focus?.focus({preventScroll:true});window.scrollTo(origin.scrollX,origin.scrollY);
 }
+function v7Action(action,b){
+  if(!action.startsWith('v7-'))return false;
+  if(action==='v7-record-stop'){playback.stopRecording();return true;}
+  if(action==='v7-rename-phase'){
+    const form=$('#v7-phase-form'),title=$('#v7-phase-title')?.value.trim(),frame=currentBoardRoot()?.frames[ui4.frameIndex];
+    if(!frame||!title)return notify('Escribe un nombre de fase.',true),true;
+    frame.title=title;if(save('Nombre de fase guardado.')){savedForm(form);if(!dirty)render();}return true;
+  }
+  if(!canLeave())return true;
+  if(action==='v7-field'){currentBoard().fieldMode=b.dataset.value;save('Encuadre guardado, coordenadas conservadas.');render();return true;}
+  if(action==='v7-record'){if(motion.matches){notify('Movimiento reducido: grabación no iniciada.',true);return true;}playback.record([snapshot(currentBoardRoot()),...currentBoardRoot().frames.map(f=>f.snapshot)]).catch(e=>notify(e.message,true));return true;}
+  if(action==='v7-calendar-season'){ui4.weekMode='season';render();return true;}
+  if(action==='v7-season-month'){period='month';ui4.weekMode='microcycle';selectDate(b.dataset.date);return true;}
+  if(action==='v7-own-player'){section=view='roster';rosterUi.playerId=selectedPlayerId=b.dataset.id;render();focusElement('.roster-player-title');return true;}
+  if(action==='v7-present'||action==='v7-report'){presentationIndex=0;presentationPrint=action==='v7-report';view='presentation';section='analysis';render();if(presentationPrint)window.print();else focusElement('#print-summary h2');return true;}
+  if(action==='v7-present-exit'){presentationPrint=false;view='analysis';render();focusElement('#view-panel h1');return true;}
+  if(action==='v7-present-back'||action==='v7-present-next'){presentationIndex=Math.max(0,Math.min(presentationBlocks7(state).length-1,presentationIndex+(action==='v7-present-next'?1:-1)));presentationPrint=false;render();focusElement('#print-summary h2');return true;}
+  if(action==='v7-present-print'){presentationPrint=true;render();window.print();return true;}
+  return true;
+}
 document.addEventListener('click', event => {
   const tab = event.target.closest('[data-tab]');
   if (tab) { if (!changeView(tab.dataset.tab)) $(`#tab-${section}`).focus(); return; }
   const b = event.target.closest('[data-action]'); if (!b || b.disabled) return;
   const action = b.dataset.action;
-  if(action!=='v4-play')playback.stop();
+  if(!['v4-play','v7-record-stop'].includes(action))playback.stop();
+  if(v7Action(action,b))return;
   if(action==='v6-stop'){playback.stop();return;}
   if(action==='v6-home'){
     playback.stop();if(!canLeave())return;
@@ -574,7 +622,7 @@ document.addEventListener('click', event => {
     else selectedRivalId=b.dataset.id;
     render();focusElement('#person-name');return;
   }
-  if(action==='delete-rival'){if(!confirm('¿Eliminar esta ficha ficticia?'))return;state.rivals=state.rivals.filter(p=>p.id!==selectedRivalId);selectedRivalId=null;dirty=false;save();render();return;}
+  if(action==='delete-rival'){if(!confirm('¿Eliminar esta ficha ficticia?'))return;state.rivals=state.rivals.filter(p=>p.id!==selectedRivalId);state.analysisV7.rivalLineup=state.analysisV7.rivalLineup.filter(id=>id!==selectedRivalId);selectedRivalId=null;dirty=false;save();render();return;}
   if(action==='remove-photo'){if(!confirm('¿Quitar la foto de esta ficha?'))return;const f=$('#person-form');const p=(f.dataset.kind==='rival'?state.rivals:state.players).find(p=>p.id===f.dataset.id);p.photo=null;save();const image=f.querySelector('.avatar');if(image)image.outerHTML=avatar(p);return;}
   if (action === 'goto-week') return changeView('week',true);
   if (action === 'day' || action === 'session') {
@@ -612,7 +660,7 @@ document.addEventListener('click', event => {
   }
   if (action === 'reset') {
     if(storageBlocked)return notify('Guardado bloqueado: exporta antes de recuperar los datos. No se sobrescribirá la fuente.',true);
-    if (!window.confirm('¿Restablecer todos los datos de esta demo? Se perderán los cambios guardados y de formulario.')) return;
+    if (!window.confirm('¿Restablecer solo el equipo de esta demo? Academia no se modifica. Se perderán los cambios guardados y de formulario del equipo.')) return;
     try{store.reset();syncStore();}catch{notify('Acceso bloqueado: no se ha restablecido.',true);return;}
     state = fresh();Object.assign(rosterUi,rosterDefaults(state)); storageBlocked = false; storageMessage = ''; dirty = false; view = section = 'week'; selectedPieceId = selectedExerciseId = null;exerciseOwner='session';needsInitialSave=false;ui4.variantId=null;ui4.frameIndex=-1;
     save('Demo restablecida.'); render(); focusElement('#tab-week'); return;
@@ -626,7 +674,7 @@ document.addEventListener('click', event => {
     if (board.pieces.length >= 40) return notify('Límite de demo: 40 piezas.',true);
     const labels = board.pieces.filter(p => p.kind === kind).map(p => p.label);
     let n = 1; while (labels.includes(kind === 'player' ? String(n) : `C${n}`)) n++;
-    const p = { id:uid(), kind, label:kind === 'player' ? String(n) : `C${n}`, x:50,y:50,team:'neutral',role:'' };
+    const p = { id:uid(), kind, label:kind === 'player' ? String(n) : `C${n}`, x:board.fieldMode==='half'?25:50,y:50,team:'neutral',role:'' };
     board.pieces.push(p); selectedPieceId = p.id; save('Pieza añadida.'); render(); focusElement('#piece-select'); return;
   }
   if (action === 'delete-piece') {
@@ -646,6 +694,22 @@ document.addEventListener('submit', async event => {
   event.preventDefault(); const form = event.target;
   if (!form.reportValidity()) return;
   const data = new FormData(form);
+  if(form.id==='v7-load-form'){
+    const candidate=structuredClone(state),session=candidate.sessions.find(s=>s.id===form.dataset.id);if(!session)return;
+    session.load={...loadDefaults(),...Object.fromEntries(['plannedMinutes','plannedEffort','actualMinutes','actualEffort'].map(k=>[k,data.get(k)===''?null:Number(data.get(k))]))};commitV4(candidate,'Volumen e índice DEMO guardados.',form);return;
+  }
+  if(form.id==='v7-categories'){
+    const candidate=structuredClone(state);candidate.manualLoads.days[state.activeDate]=data.get('dayCategory');candidate.manualLoads.weeks[monday(state.activeDate)]=data.get('weekCategory');commitV4(candidate,'Categorías manuales guardadas.',form);return;
+  }
+  if(form.id==='v7-analysis-form'){
+    const candidate=structuredClone(state),lineup=Array.from({length:11},(_,i)=>data.get(`rival-${i}`)).filter(Boolean);
+    if(new Set(lineup).size!==lineup.length){notify('Once rival repetido. Selecciona fichas distintas.',true);return;}
+    Object.assign(candidate.analysisV7,{rivalFormation:data.get('rivalFormation'),rivalLineup:lineup,blocks:data.getAll('blocks')});
+    for(const k of ['ownABPAttack','ownABPDefend','rivalABPAttack','rivalABPDefend'])candidate.analysisV7[k]=data.get(k);
+    for(const side of ['own','rival'])for(const k of ['strengths','weaknesses'])candidate.analysis[side][k]=data.get(`${side}-${k}`);
+    commitV4(candidate,'Plan prepartido guardado.',form);return;
+  }
+  if(form.id==='v7-phase-form'){v7Action('v7-rename-phase',form);return;}
   if(form.id.startsWith('v4-')||form.id.startsWith('v5-')){try{const candidate=submitRoster(form,data,state,rosterUi,ui4,formCandidate,section);if(candidate)commitV4(candidate,'Datos ficticios guardados.',form);}catch(error){notify(error.message,true);}return;}
   if (form.id === 'new-session-form') {
     const title = data.get('title').trim(); if (!title) { $('#new-title').setCustomValidity('Escribe un nombre de sesión.'); $('#new-title').reportValidity(); return; }
@@ -698,6 +762,7 @@ document.addEventListener('input', event => {
 document.addEventListener('change', event => {
   playback.stop();
   const node = event.target;
+  if(node.dataset.v7Color){currentBoard().palette[node.dataset.v7Color]=node.value;save('Color de esta fase guardado.');drawPreview(currentBoard());return;}
   if(node.id==='v6-objective'){libraryUi.filter=node.value;$('#v6-results').innerHTML=libraryResults(state,libraryUi,selectedExerciseId);icons();return;}
   if(node.id==='v6-destination'){libraryUi.destination=node.value;return;}
   if(node.closest('form'))refreshDirty();
@@ -745,7 +810,7 @@ document.addEventListener('change', event => {
   }
 });
 document.addEventListener('keydown', event => {
-  if(!event.target.closest('[data-action="v4-play"]'))playback.stop();
+  if(!event.target.closest('[data-action="v4-play"],[data-action="v7-record-stop"]'))playback.stop();
   const tab = event.target.closest('[data-tab]');
   if (tab && ['ArrowLeft','ArrowRight','Home','End'].includes(event.key)) {
     event.preventDefault(); const tabs = $$('[data-tab]'); const i = tabs.indexOf(tab);
@@ -777,7 +842,7 @@ function endDrag(event) {
 document.addEventListener('pointerup',endDrag);
 document.addEventListener('pointercancel',endDrag);
 document.addEventListener('focusin', event => { const p = event.target.closest('[data-piece]'); if (p) { selectedPieceId = p.dataset.piece; updatePiece(); } });
-window.addEventListener('beforeunload', event => { if (dirty) { event.preventDefault(); event.returnValue = ''; } });
+window.addEventListener('beforeunload', event => { if (dirty||academyController?.hasPendingChanges()) { event.preventDefault(); event.returnValue = ''; } });
 window.addEventListener('beforeprint',()=>playback.stop());
 window.addEventListener('storage', event => {
   if (!store.affected(event.key)) return;
@@ -789,4 +854,4 @@ render();
 document.addEventListener('visibilitychange',()=>{if(document.hidden)playback.stop();});
 document.addEventListener('focusin',event=>{if(event.target.matches('input,select,textarea'))playback.stop();});
 motion.addEventListener('change',()=>{playback.stop();const button=$('[data-action="v4-play"]');if(button)button.disabled=motion.matches||!currentBoardRoot()?.frames.length;});
-if (!storageBlocked && needsInitialSave) {save();if(!storageBlocked && Object.values(migrationSources).some(raw=>raw!==null)){storageMessage='Migración a v6: fuentes anteriores intactas; objetivos sin clasificar. Semana original v1 conservada cuando aplica.';storageUI();}}
+if (!storageBlocked && needsInitialSave) {$('#save-status').textContent='Demo en memoria · Guardado pendiente de acción explícita';}

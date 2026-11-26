@@ -30,6 +30,17 @@ const files = [
   'demos/futbol/library-view-v6.mjs', 'demos/futbol/model-v5.mjs',
   'demos/futbol/model-v6.mjs', 'demos/futbol/roster-controller-v5.mjs',
   'demos/futbol/roster-metrics-v5.mjs', 'demos/futbol/roster-view-v5.mjs',
+  'demos/futbol/academy-controller-v7.mjs',
+  'demos/futbol/academy-model-v7.mjs',
+  'demos/futbol/academy-v7.css',
+  'demos/futbol/academy-v7.mjs',
+  'demos/futbol/analysis-v7.css',
+  'demos/futbol/analysis-v7.mjs',
+  'demos/futbol/board-v7.mjs',
+  'demos/futbol/model-v7.mjs',
+  'demos/futbol/planning-v7.css',
+  'demos/futbol/planning-v7.mjs',
+  'demos/futbol/playback-v7.mjs',
 ];
 
 function packagePublic(destination) {
