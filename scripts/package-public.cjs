@@ -26,6 +26,10 @@ const files = [
   'demos/futbol/board-v4.mjs', 'demos/futbol/model-v4.mjs',
   'demos/futbol/playback-v4.mjs', 'demos/futbol/store-v4.mjs',
   'demos/futbol/workbench-v4.mjs',
+  'demos/futbol/animation-v6.mjs', 'demos/futbol/library-controller-v6.mjs',
+  'demos/futbol/library-view-v6.mjs', 'demos/futbol/model-v5.mjs',
+  'demos/futbol/model-v6.mjs', 'demos/futbol/roster-controller-v5.mjs',
+  'demos/futbol/roster-metrics-v5.mjs', 'demos/futbol/roster-view-v5.mjs',
 ];
 
 function packagePublic(destination) {

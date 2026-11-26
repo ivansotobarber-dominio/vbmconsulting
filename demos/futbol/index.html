@@ -16,17 +16,19 @@
 <body>
   <a class="skip" href="#main">Ir al contenido</a>
   <header class="app-header">
-    <div class="brand"><span class="brand-symbol" aria-hidden="true">T.</span><span>terreno<span class="brand-sub">Preparación deportiva</span></span></div>
+    <div class="brand"><span class="brand-symbol" aria-hidden="true">T.</span><span>terreno<span class="brand-sub">Preparación deportiva</span></span></div><button id="home-access" class="icon-button" data-action="v6-home" title="Inicio" aria-label="Inicio"><i data-lucide="house"></i></button>
     <div class="team-identity"><strong>Equipo demo</strong><span>Fútbol 11 · Adultos ficticios</span></div>
     <div class="header-end"><span class="demo-badge">DEMO PÚBLICA</span><button class="icon-button" data-action="export" title="Exportar JSON" aria-label="Exportar JSON"><i data-lucide="download"></i></button><button class="icon-button" data-action="print" title="Imprimir resumen" aria-label="Imprimir resumen"><i data-lucide="printer"></i></button></div>
   </header>
-  <p class="storage-warning" role="note">Demo pública. Solo datos ficticios. No introduzcas datos reales. URL pública; noindex no restringe el acceso.</p>
+  <p class="storage-warning" role="note">BETA pública. Solo datos ficticios. Esta URL no es privada ni tiene control de acceso. No introduzcan datos reales. El alojamiento puede conservar registros técnicos.</p>
   <div id="storage-warning" class="storage-warning" role="alert" hidden></div>
   <div class="workspace">
     <div class="nav-row"><nav class="tabs" role="tablist" aria-label="Vistas de preparación">
-      <button id="tab-week" role="tab" aria-selected="true" aria-controls="view-panel" data-tab="week"><i data-lucide="calendar-days"></i><span>Semana</span></button>
+      <button id="tab-week" role="tab" aria-selected="true" aria-controls="view-panel" data-tab="week"><i data-lucide="calendar-days"></i><span>Planificación</span></button>
       <button id="tab-analysis" role="tab" aria-selected="false" aria-controls="view-panel" tabindex="-1" data-tab="analysis"><i data-lucide="scan-eye"></i><span>Análisis</span></button>
       <button id="tab-match" role="tab" aria-selected="false" aria-controls="view-panel" tabindex="-1" data-tab="match"><i data-lucide="flag"></i><span>Partido</span></button>
+      <button id="tab-roster" role="tab" aria-selected="false" aria-controls="view-panel" tabindex="-1" data-tab="roster"><i data-lucide="users"></i><span>Plantilla</span></button>
+      <button id="tab-academy" role="tab" aria-selected="false" aria-controls="view-panel" tabindex="-1" data-tab="academy"><i data-lucide="school"></i><span>Academia</span></button>
     </nav><span id="save-status" class="save-status" role="status">Datos de demo</span></div>
     <main id="main" tabindex="-1"><div id="view-panel" role="tabpanel" aria-labelledby="tab-week"></div></main>
     <footer class="app-footer"><span>Temporada de demo 2026/27 · Sin datos reales</span><button class="text-button" data-action="reset"><i data-lucide="rotate-ccw"></i>Restablecer demo</button></footer>
