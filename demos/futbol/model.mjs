@@ -2,7 +2,7 @@ export const KEY = 'terreno.demo.v2';
 export const V1KEY = 'terreno.demo.v1';
 export const ANCHOR = '2026-11-23';
 export const KINDS = {player:'Jugador',cone:'Cono',ladder:'Escalera',goal:'Miniportería',ball:'Balón',obstacle:'Obstáculo'};
-export const PHASES = {attack:'Ataque con balón',defend:'Defensa sin balón',recover:'Transición tras recuperación',loss:'Transición tras pérdida'};
+export const PHASES = {attack:'Organización ofensiva',loss:'Transición ataque-defensa',defend:'Organización defensiva',recover:'Transición defensa-ataque'};
 export const BOARDS = {buildup:'Salida de balón',attackCorner:'ABP ofensivo · Córner',attackWide:'ABP ofensivo · Falta lateral',attackFront:'ABP ofensivo · Falta frontal',defendCorner:'ABP defensivo · Córner',defendWide:'ABP defensivo · Falta lateral',defendFront:'ABP defensivo · Falta frontal',press:'Presión alta rival',beaten:'Primera línea superada'};
 export const uid = () => crypto.randomUUID();
 export const addDays = (iso,n) => {const d=new Date(`${iso}T12:00:00Z`);d.setUTCDate(d.getUTCDate()+n);return d.toISOString().slice(0,10);};

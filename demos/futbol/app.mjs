@@ -8,7 +8,7 @@ import {libraryDefaults,newExercise,objectiveLabels} from './library-controller-
 import {libraryView,libraryResults,tagFields} from './library-view-v6.mjs';
 import {createPlayback7} from './playback-v7.mjs';
 import {boardSVG7 as boardSVG,objectSVG7 as objectSVG,boardEditor7,phaseToolbar7,phaseQuickToolbar7,inspector7 as inspector} from './board-v7.mjs';
-import {manualLoadForm,loadForm,weekComparison,categoryBadge,seasonCalendar} from './planning-v7.mjs';
+import {manualLoadForm,loadForm,weekComparison,categoryBadge,seasonCalendar,sessionLibrary} from './planning-v7.mjs';
 import {analysisTools7,presentation7,presentationBlocks7} from './analysis-v7.mjs';
 import {renderRoster,rosterSummary,minimalWeekSummary} from './roster-view-v5.mjs';
 import {rosterDefaults,submitRoster,rosterAction} from './roster-controller-v5.mjs';
@@ -131,6 +131,8 @@ let dirty = false;
 const dirtyForms = new Set();
 const formBaselines = new Map();
 let analysisReturn = null;
+let analysisSide = 'own';
+let planningExerciseId = null;
 const formNames={'session-edit':'Sesión','exercise-form':'Ejercicio','analysis-form':'Análisis','match-form':'Once','board-form':'Consigna','person-form':'Ficha','new-session-form':'Nueva sesión','v4-plan-session':'Planificación de sesión','v4-plan-exercise':'Planificación de ejercicio','v4-fixture':'Partido de referencia','v4-phase':'Fase','v4-season':'Temporada','v4-record':'Registro ficticio','v4-nutrition':'Pauta ficticia','v4-problem':'Problema','v4-partitions':'Banquillo y consignas'};
 Object.assign(formNames,{'v5-profile':'Datos deportivos','v5-season':'Temporada deportiva','v5-competition':'Competición','v5-session-season':'Atribución de sesión','v5-stat':'Estadística de partido','v5-rule':'Nueva versión de regla','v5-sanction':'Sanción manual'});
 Object.assign(formNames,{'v7-load-form':'Volumen e índice DEMO','v7-categories':'Categorías manuales','v7-analysis-form':'Plan prepartido','v7-phase-form':'Nombre de fase'});
@@ -233,7 +235,7 @@ function render(preview=false) {
   if(view==='week'&&ui4.weekMode==='microcycle'){
     $('.calendar-toolbar .segmented')?.insertAdjacentHTML('beforeend','<button data-action="v7-calendar-season" aria-pressed="false">Temporada</button>');
     for(const day of $$('[data-action="day"]')){day.insertAdjacentHTML('beforeend',categoryBadge(state,day.dataset.date));const sessions=state.sessions.filter(s=>s.date===day.dataset.date),pending=sessions.some(s=>s.tasks.some(t=>t.duration===null)),label=day.querySelector('.day-load');if(label&&sessions.length)label.textContent=`${sessions.reduce((n,s)=>n+minutes(s),0)} min previstos${pending?' parciales':''}`;}
-    $('.calendar-toolbar')?.insertAdjacentHTML('afterend',manualLoadForm(state)+weekComparison(state));
+    $('.week-layout')?.insertAdjacentHTML('afterend',`<details class="planning-secondary"><summary>Categorías y comparación semanal</summary>${manualLoadForm(state)+weekComparison(state)}</details>`);
     if(currentSession())$('.session-workspace')?.insertAdjacentHTML('beforeend',loadForm(currentSession()));
   }
   if(view==='week'&&ui4.weekMode==='season')$('#view-panel').insertAdjacentHTML('beforeend',seasonCalendar(state));
@@ -272,10 +274,10 @@ function renderWeekBase() {
   return heading('Semana de trabajo', 'Equipo demo · Preparación colectiva', `<button class="primary" data-action="new-session">${icon('plus')}Nueva sesión</button>`) +
     `<div class="calendar-toolbar"><div class="segmented"><button data-action="period" data-period="week" aria-pressed="${period==='week'}">Semana</button><button data-action="period" data-period="month" aria-pressed="${period==='month'}">Mes</button></div><button class="icon-button secondary" data-action="calendar-prev" title="Periodo anterior" aria-label="Periodo anterior">${icon('chevron-left')}</button><label for="calendar-date" class="sr-only">Fecha de calendario</label><input id="calendar-date" type="date" min="1900-01-01" max="2100-12-31" value="${state.activeDate}"><button class="icon-button secondary" data-action="calendar-next" title="Periodo siguiente" aria-label="Periodo siguiente">${icon('chevron-right')}</button><strong>${new Date(`${state.activeDate}T12:00:00`).toLocaleDateString('es-ES',{month:'long',year:'numeric'})}</strong></div>` +
     `<div class="week-strip ${period==='month'?'month-grid':''}" aria-label="Calendario">${dates.map((date,i) => { const sessions = state.sessions.filter(t => t.date === date); return `<button class="day" data-action="day" data-date="${date}" aria-label="${date}, ${sessions.length} sesiones" aria-pressed="${!state.legacySelected && state.activeDate === date}"><span class="day-name">${SHORT[i%7]}</span><span class="day-number">${Number(date.slice(8))}</span><span class="day-load">${sessions.length ? `${sessions.reduce((sum,t) => sum+minutes(t),0)} min` : 'Libre'}</span></button>`; }).join('')}</div>` +
-    `<div class="week-layout"><aside class="session-sidebar"><div class="section-heading"><h2>${state.legacySelected?'Sin fecha':state.activeDate}</h2><span class="count">${daySessions.length} ses.</span></div><div class="session-choices">${daySessions.map(t => `<button class="session-choice" data-action="session" data-id="${esc(t.id)}" aria-pressed="${s?.id === t.id}"><strong>${esc(t.title)}</strong><small>${t.tasks.length} tareas · ${minutes(t)} min${t.date===null?` · ${DAYS[t.day]} original`:''}</small></button>`).join('') || '<p class="sidebar-empty">Sin sesiones programadas.</p>'}</div><h3>Plantillas de sesión</h3>${[['connect','Conectar y progresar'],['transition','Transiciones y finalización'],['match','Preparación de partido']].map(([id,title])=>`<button class="text-button sidebar-add" data-action="template" data-template="${id}">${icon('copy-plus')}${title}</button>`).join('')}</aside><section class="session-workspace">${s ? sessionEditor(s) : `<div class="empty-state">${icon('calendar-plus')}<h2>Un día por preparar</h2><p>${state.activeDate}</p><button class="primary" data-action="new-session">${icon('plus')}Crear sesión</button></div>`}</section></div>`;
+    `<div class="week-layout"><aside class="session-sidebar"><div class="section-heading"><h2>${state.legacySelected?'Sin fecha':state.activeDate}</h2><span class="count">${daySessions.length} ses.</span></div><div class="session-choices">${daySessions.map(t => `<button class="session-choice" data-action="session" data-id="${esc(t.id)}" aria-pressed="${s?.id === t.id}"><strong>${esc(t.title)}</strong><small>${t.tasks.length} tareas · ${minutes(t)} min${t.date===null?` · ${DAYS[t.day]} original`:''}</small></button>`).join('') || '<p class="sidebar-empty">Sin sesiones programadas.</p>'}</div><details class="planning-secondary"><summary>Plantillas de sesión</summary>${[['connect','Conectar y progresar'],['transition','Transiciones y finalización'],['match','Preparación de partido']].map(([id,title])=>`<button class="text-button sidebar-add" data-action="template" data-template="${id}">${icon('copy-plus')}${title}</button>`).join('')}</details></aside><section class="session-workspace">${s ? sessionEditor(s) : planningLibrary()}</section></div>`;
 }
 function renderWeek(){
-  const content=ui4.weekMode==='season'?renderSeason(state,ui4):ui4.weekMode==='individual'?renderIndividual(state,ui4):ui4.weekMode==='nutrition'?renderNutrition(state,ui4):microcycleToolbar(state,ui4)+(exerciseOwner==='library'&&!currentSession()?heading('Biblioteca propia','Ejercicios ficticios')+sessionEditor(null):renderWeekBase());
+  const content=ui4.weekMode==='season'?renderSeason(state,ui4):ui4.weekMode==='individual'?renderIndividual(state,ui4):ui4.weekMode==='nutrition'?renderNutrition(state,ui4):(exerciseOwner==='library'&&!currentSession()?heading('Biblioteca propia','Ejercicios ficticios')+sessionEditor(null):renderWeekBase())+`<details class="planning-secondary"><summary>Referencia y duplicación de semana</summary>${microcycleToolbar(state,ui4)}</details>`;
   return weekNavigation(ui4)+content;
 }
 function boardEditor(board,lines,id){const root=currentBoardRoot();return boardEditor7(currentBoard(),lines,id,phaseToolbar7(root,ui4,motion.matches,playback.playing),phaseQuickToolbar7(root,ui4,motion.matches,playback.playing));}
@@ -289,8 +291,10 @@ function sessionVolume(s){
 function sessionEditor(s){
   if(exerciseOwner==='library')return `<div class="section-heading"><h2>Biblioteca propia</h2><button class="secondary" data-action="leave-library">${icon('arrow-left')}Sesión</button></div>${exerciseEditor(currentExercise())}`;
   if(!s.tasks.some(t=>t.id===selectedExerciseId))selectedExerciseId=s.tasks[0]?.id??null;
-  return `<form id="session-edit" class="session-form"><div><label for="session-title">Sesión</label><input id="session-title" name="title" maxlength="80" required value="${esc(s.title)}"></div><div class="session-volume">${sessionVolume(s)}</div><div><label for="session-date">Fecha</label><input id="session-date" name="date" type="date" min="1900-01-01" max="2100-12-31" required value="${s.date}"></div><div><label for="session-intensity">Intensidad prevista (opcional 1–10)</label><input id="session-intensity" name="intensity" type="number" min="1" max="10" step="1" value="${s.intensity??''}"></div><div class="objective-field"><label for="session-objective">Objetivo colectivo</label><textarea id="session-objective" name="objective" maxlength="500">${esc(s.objective)}</textarea><fieldset class="called"><legend>Convocados ficticios (${s.called.length})</legend>${state.players.map(p=>`<label><input type="checkbox" name="called" value="${esc(p.id)}" ${s.called.includes(p.id)?'checked':''}>${esc(p.name)}</label>`).join('')}</fieldset></div><div class="form-actions"><button type="button" class="text-button danger" data-action="delete-session">${icon('trash-2')}Eliminar sesión</button><button type="button" class="secondary" data-action="open-board">${icon('waypoints')}Pizarra general de sesión</button><button class="secondary" type="submit">${icon('check')}Guardar sesión</button></div></form>${planForm(s,'session')}<div class="section-heading"><h2>Ejercicios (${s.tasks.length})</h2><button class="secondary" data-action="library">${icon('plus')}Biblioteca</button></div><ol class="exercise-list">${s.tasks.map((t,i)=>`<li data-task="${esc(t.id)}"><button class="exercise-choice" data-action="select-exercise" data-id="${esc(t.id)}" aria-pressed="${t.id===selectedExerciseId}"><span>${i+1}</span><strong data-exercise-title="${esc(t.id)}">${esc(t.title)}</strong><small>${t.duration===null?'Tiempo pendiente':`${t.duration} min`}</small></button><button class="icon-button" data-action="task-up" data-id="${esc(t.id)}" title="Subir ejercicio" aria-label="Subir ${esc(t.title)}" ${i===0?'disabled':''}>${icon('arrow-up')}</button><button class="icon-button" data-action="task-down" data-id="${esc(t.id)}" title="Bajar ejercicio" aria-label="Bajar ${esc(t.title)}" ${i===s.tasks.length-1?'disabled':''}>${icon('arrow-down')}</button></li>`).join('')}</ol>${s.tasks.length?exerciseEditor(currentExercise()):'<p class="muted">Sin ejercicios.</p>'}`;
+  return planningLibrary()+`<div class="section-heading"><h2>Ejercicios de ${esc(s.title)} (${s.tasks.length})</h2><div class="session-volume">${sessionVolume(s)}</div></div><ol class="exercise-list">${s.tasks.map((t,i)=>`<li data-task="${esc(t.id)}"><button class="exercise-choice" data-action="select-exercise" data-id="${esc(t.id)}" aria-pressed="${t.id===selectedExerciseId}"><span>${i+1}</span><strong data-exercise-title="${esc(t.id)}">${esc(t.title)}</strong><small>${t.duration===null?'Tiempo pendiente':`${t.duration} min`}</small></button><button class="icon-button" data-action="task-up" data-id="${esc(t.id)}" title="Subir ejercicio" aria-label="Subir ${esc(t.title)}" ${i===0?'disabled':''}>${icon('arrow-up')}</button><button class="icon-button" data-action="task-down" data-id="${esc(t.id)}" title="Bajar ejercicio" aria-label="Bajar ${esc(t.title)}" ${i===s.tasks.length-1?'disabled':''}>${icon('arrow-down')}</button></li>`).join('')}</ol>${s.tasks.length?exerciseEditor(currentExercise()):'<p class="muted">Sin ejercicios.</p>'}
+  <form id="session-edit" class="session-form planning-notes"><h2>Objetivos y observaciones</h2><div class="objective-field"><label for="session-objective">Objetivos generales</label><textarea id="session-objective" name="objective" maxlength="500" rows="2">${esc(s.objective)}</textarea><label for="session-observations">Observaciones / objetivo táctico</label><textarea id="session-observations" name="tacticalObjective" maxlength="1000" rows="2">${esc(s.tacticalObjective)}</textarea></div><details class="planning-secondary"><summary>Datos de sesión y convocatoria</summary><div><label for="session-title">Sesión</label><input id="session-title" name="title" maxlength="80" required value="${esc(s.title)}"></div><div><label for="session-date">Fecha</label><input id="session-date" name="date" type="date" min="1900-01-01" max="2100-12-31" required value="${s.date}"></div><div><label for="session-intensity">Intensidad prevista (opcional 1–10)</label><input id="session-intensity" name="intensity" type="number" min="1" max="10" step="1" value="${s.intensity??''}"></div><fieldset class="called"><legend>Convocados ficticios (${s.called.length})</legend>${state.players.map(p=>`<label><input type="checkbox" name="called" value="${esc(p.id)}" ${s.called.includes(p.id)?'checked':''}>${esc(p.name)}</label>`).join('')}</fieldset><button type="button" class="text-button danger" data-action="delete-session">${icon('trash-2')}Eliminar sesión</button></details><div class="form-actions"><button type="button" class="secondary" data-action="open-board">${icon('waypoints')}Pizarra general de sesión</button><button class="primary" type="submit">${icon('check')}Guardar sesión</button></div></form><details class="planning-secondary"><summary>Planificación complementaria de sesión</summary>${planForm(s,'session')}</details>`;
 }
+function planningLibrary(){return sessionLibrary(state,planningExerciseId,b=>boardSVG(b,pitchLines));}
 function exerciseEditor(t){
   if(!t)return '<p>Sin ejercicio seleccionado.</p>';
   if(!boardItems(currentBoard()).some(p=>p.id===selectedPieceId))selectedPieceId=boardItems(currentBoard())[0]?.id??null;
@@ -369,7 +373,10 @@ function miniPitch(formation, lineup) {
   const positions=FORMATIONS[formation],cells=lineupNameCells(positions);
   return `<svg class="mini-pitch" viewBox="0 0 900 580" role="img" aria-label="Alineación ${esc(formation)}">${pitchLines()}${positions.map(([x,y],i) => {const p=state.players.find(p=>p.id===lineup[i]);return `<g transform="translate(${x*9},${y*5.8})"><title>${esc(p?.name??'')}</title>${p?.photo?`<image href="${esc(p.photo)}" x="-20" y="-20" width="40" height="40"/>`:'<circle r="19" fill="#fff"/>'}<text text-anchor="middle" dominant-baseline="central" fill="#173f2d" font-size="16" font-family="Arial" font-weight="700">${p?.dorsal??i+1}</text>${lineupName(p?.name??'',x*9,y*5.8,cells[i])}</g>`;}).join('')}</svg>`;
 }
-function renderAnalysis(){return renderAnalysisBase()+analysisTools7(state,FORMATIONS)+renderProblems(state,ui4);}
+function renderAnalysis(){
+ const side=analysisSide,title=side==='own'?'Análisis de nuestro equipo':'Análisis del rival';
+ return heading('Análisis','Adultos ficticios')+`<label for="analysis-side">Análisis</label><select id="analysis-side"><option value="own" ${side==='own'?'selected':''}>Análisis de nuestro equipo</option><option value="rival" ${side==='rival'?'selected':''}>Análisis del rival</option></select><h2>${title}</h2><form id="analysis-form" data-side="${side}"><section class="analysis-column">${Object.entries(PHASES).map(([key,label])=>`<label for="${side}-${key}">${label}</label><textarea id="${side}-${key}" name="${side}-${key}" maxlength="3000" rows="3">${esc(state.analysis[side][key])}</textarea>`).join('')}<label for="${side}-notes">Notas</label><textarea id="${side}-notes" name="${side}-notes" maxlength="3000" rows="2">${esc(state.analysis[side].notes)}</textarea></section><div class="form-footer"><button class="primary" type="submit">${icon('check')}Guardar análisis</button></div></form>`+analysisTools7(state,FORMATIONS,side)+(side==='rival'?`<section class="roster-section"><div class="section-heading"><h2>Rivales adultos ficticios</h2><button class="secondary" data-action="new-rival">${icon('user-plus')}Nueva ficha</button></div><div class="roster-list">${state.rivals.map(p=>`<button class="session-choice" data-action="edit-rival" data-id="${esc(p.id)}">${avatar(p)}${esc(p.name)}</button>`).join('')}</div>${selectedRivalId?personEditor('rival'):''}</section>`:'')+renderProblems(state,ui4,side);
+}
 function renderMatchBase() {
   return heading('Plan de partido', 'Equipo demo · Once y situaciones') + `<form id="match-form"><div class="formation-row"><label for="formation">Formación</label><select id="formation" name="formation">${Object.keys(FORMATIONS).map(f => `<option ${currentMatch().formation === f ? 'selected' : ''}>${f}</option>`).join('')}</select></div><div class="match-layout"><section class="match-lineup"><div id="formation-preview">${miniPitch(currentMatch().formation,currentMatch().lineup)}</div><h2>Once inicial</h2><div class="lineup-list">${currentMatch().lineup.map((id,i)=>`<div class="lineup-slot"><label for="slot-${i}">${i===0?'POR':i+1}</label><select id="slot-${i}" name="slot-${i}">${state.players.map(p=>`<option value="${esc(p.id)}" ${p.id===id?'selected':''}>${p.dorsal} · ${esc(p.name)}</option>`).join('')}</select></div>`).join('')}</div></section><section><h2>Situaciones de partido</h2><div class="board-menu">${Object.entries(BOARDS).map(([k,v])=>`<button type="button" class="secondary" data-action="match-board" data-board="${k}">${icon('waypoints')}${v}</button>`).join('')}</div><details class="legacy-notes"><summary>Notas anteriores</summary>${[['attacking','Con balón'],['defending','Sin balón'],['setPieces','Balón parado']].map(([k,label])=>summaryText(label,state.match[k])).join('')}</details></section></div><div class="form-footer"><p id="match-error" class="form-error" role="alert"></p><button class="primary" type="submit">${icon('check')}Guardar partido</button></div></form><section class="roster-section"><h2>Plantilla sintética</h2><label for="player-edit">Jugador</label><select id="player-edit">${state.players.map(p=>`<option value="${esc(p.id)}" ${p.id===selectedPlayerId?'selected':''}>${p.dorsal} · ${esc(p.name)}</option>`).join('')}</select>${personEditor('player')}</section>`;
 }
@@ -417,7 +424,8 @@ function closeDialog(node) { if(!canLeave())return;node.closest('dialog')?.close
 function selectDate(date) {
   if(date<'1900-01-01'||date>'2100-12-31'){notify('Fecha fuera de 1900–2100.',true);return;}
   exerciseOwner='session';selectedExerciseId=null;
-  state.activeDate=date;state.selectedSessionId=state.sessions.find(t=>t.date===date)?.id??null;selectedPieceId=null;save();render();focusElement(`[data-date="${date}"]`);
+  const sessions=state.sessions.filter(t=>t.date===date);
+  state.activeDate=date;state.selectedSessionId=sessions.length===1?sessions[0].id:null;selectedPieceId=null;save();render();focusElement(`[data-date="${date}"]`);
 }
 function exportData() {
   refreshDirty();
@@ -548,6 +556,12 @@ document.addEventListener('click', event => {
   const action = b.dataset.action;
   if(!['v4-play','v7-record-stop'].includes(action))playback.stop();
   if(v7Action(action,b))return;
+  if(action==='planning-preview'||action==='planning-add'){
+    playback.stop();if(!canLeave())return;
+    if(action==='planning-preview'){planningExerciseId=b.dataset.id;render();focusElement('.planning-preview summary');return;}
+    const session=currentSession();if(!session||session.date!==state.activeDate)return notify('Elige una sesión de destino.',true);
+    try{const result=copyToSession(state,b.dataset.id,session.id,clean);selectedExerciseId=result.copyId;exerciseOwner='session';if(commitV4(result.candidate,'Copia independiente añadida.'))focusElement('#exercise-title');}catch(error){notify(error.message,true);}return;
+  }
   if(action==='v6-stop'){playback.stop();return;}
   if(action==='v6-home'){
     playback.stop();if(!canLeave())return;
@@ -702,25 +716,26 @@ document.addEventListener('submit', async event => {
     const candidate=structuredClone(state);candidate.manualLoads.days[state.activeDate]=data.get('dayCategory');candidate.manualLoads.weeks[monday(state.activeDate)]=data.get('weekCategory');commitV4(candidate,'Categorías manuales guardadas.',form);return;
   }
   if(form.id==='v7-analysis-form'){
-    const candidate=structuredClone(state),lineup=Array.from({length:11},(_,i)=>data.get(`rival-${i}`)).filter(Boolean);
+    const candidate=structuredClone(state),side=form.dataset.side,lineup=Array.from({length:11},(_,i)=>data.get(`rival-${i}`)).filter(Boolean);
     if(new Set(lineup).size!==lineup.length){notify('Once rival repetido. Selecciona fichas distintas.',true);return;}
-    Object.assign(candidate.analysisV7,{rivalFormation:data.get('rivalFormation'),rivalLineup:lineup,blocks:data.getAll('blocks')});
-    for(const k of ['ownABPAttack','ownABPDefend','rivalABPAttack','rivalABPDefend'])candidate.analysisV7[k]=data.get(k);
-    for(const side of ['own','rival'])for(const k of ['strengths','weaknesses'])candidate.analysis[side][k]=data.get(`${side}-${k}`);
+    if(side==='rival')Object.assign(candidate.analysisV7,{rivalFormation:data.get('rivalFormation'),rivalLineup:lineup});
+    candidate.analysisV7.blocks=data.getAll('blocks');
+    for(const k of ['ABPAttack','ABPDefend'])candidate.analysisV7[side+k]=data.get(side+k);
+    for(const k of ['strengths','weaknesses'])candidate.analysis[side][k]=data.get(`${side}-${k}`);
     commitV4(candidate,'Plan prepartido guardado.',form);return;
   }
   if(form.id==='v7-phase-form'){v7Action('v7-rename-phase',form);return;}
   if(form.id.startsWith('v4-')||form.id.startsWith('v5-')){try{const candidate=submitRoster(form,data,state,rosterUi,ui4,formCandidate,section);if(candidate)commitV4(candidate,'Datos ficticios guardados.',form);}catch(error){notify(error.message,true);}return;}
   if (form.id === 'new-session-form') {
     const title = data.get('title').trim(); if (!title) { $('#new-title').setCustomValidity('Escribe un nombre de sesión.'); $('#new-title').reportValidity(); return; }
-    const s = { id:uid(), day:(new Date(`${state.activeDate}T12:00:00Z`).getUTCDay()+6)%7,date:state.activeDate, title, objective:data.get('objective').trim(), tasks:[], board:upgradeBoard({...defaultBoard(),arrows:[],text:''}),called:[],intensity:null,...planDefaults() };
+    const s = { id:uid(), day:(new Date(`${state.activeDate}T12:00:00Z`).getUTCDay()+6)%7,date:state.activeDate, title, objective:data.get('objective').trim(), tasks:[], board:upgradeBoard({...defaultBoard(),arrows:[],text:''}),called:[],intensity:null,...planDefaults(),load:loadDefaults() };
     exerciseOwner='session';selectedExerciseId=null;
-    state.sessions.push(s); state.selectedSessionId = s.id; $('#session-dialog').close(); view = 'week';dirty=false; save('Sesión creada.'); render(); focusElement('#session-title');
+    state.sessions.push(s); state.selectedSessionId = s.id; $('#session-dialog').close(); view = 'week';dirty=false; save('Sesión creada.'); render(); focusElement('#planning-destination');
   } else if (form.id === 'session-edit') {
     const title = data.get('title').trim(); if (!title) { $('#session-title').setCustomValidity('Escribe un nombre de sesión.'); $('#session-title').reportValidity(); return; }
     if(!data.get('date')){notify('La sesión requiere una fecha.',true);return;}
-    const s=currentSession();s.title=title;s.objective=data.get('objective');s.date=data.get('date');s.intensity=data.get('intensity')===''?null:Number(data.get('intensity'));s.called=data.getAll('called');state.activeDate=s.date;
-    if(save('Sesión guardada.')){savedForm(form);if(!dirty){render();focusElement('#session-title');}else refreshExercise();}
+    const s=currentSession();s.title=title;s.objective=data.get('objective');s.tacticalObjective=data.get('tacticalObjective');s.date=data.get('date');s.intensity=data.get('intensity')===''?null:Number(data.get('intensity'));s.called=data.getAll('called');state.activeDate=s.date;
+    if(save('Sesión guardada.')){savedForm(form);if(!dirty){render();focusElement('#session-objective');}else refreshExercise();}
   } else if(form.id==='exercise-form'){
     const t=currentExercise(),next={...t,title:data.get('title').trim(),duration:data.get('duration')===''?null:Number(data.get('duration'))};
     next.objectiveTags=data.getAll('objectiveTags');
@@ -731,7 +746,8 @@ document.addEventListener('submit', async event => {
     const tasks=exerciseOwner==='library'?state.library:currentSession().tasks;tasks[tasks.findIndex(a=>a.id===t.id)]=next;
     if(save('Ejercicio guardado.')){savedForm(form);$('#exercise-error').textContent='';refreshExercise();}
   } else if (form.id === 'analysis-form') {
-    for (const k of ['own','rival']) for (const f of Object.keys(PHASES)) state.analysis[k][f] = data.get(`${k}-${f}`);
+    const side=form.dataset.side;
+    for (const f of [...Object.keys(PHASES),'notes']) state.analysis[side][f] = data.get(`${side}-${f}`);
     if(save('Análisis guardado.'))savedForm(form);
   } else if (form.id === 'match-form') {
     const lineup = Array.from({length:11},(_,i) => data.get(`slot-${i}`));
@@ -776,6 +792,12 @@ document.addEventListener('change', event => {
     if(node.id==='v4-variant'){ui4.variantId=node.value||null;ui4.frameIndex=-1;render();return;}
     if(node.id==='v4-frame'){ui4.frameIndex=Number(node.value);selectedPieceId=null;render();return;}
     const candidate=structuredClone(state);candidate.referenceMatchId=node.value||null;commitV4(candidate,'Referencia manual guardada.');return;
+  }
+  if(node.id==='analysis-side'){if(!canLeave()){node.value=analysisSide;return;}analysisSide=node.value;ui4.problemId=null;render();focusElement('#analysis-side');return;}
+  if(node.id==='planning-destination'){
+    if(!canLeave()){node.value=state.selectedSessionId??'';return;}
+    const session=state.sessions.find(s=>s.id===node.value&&s.date===state.activeDate);
+    state.selectedSessionId=session?.id??null;exerciseOwner='session';selectedExerciseId=null;selectedPieceId=null;save();render();focusElement('#planning-destination');return;
   }
   if(node.id==='calendar-date'){if(!node.reportValidity())return;if(!canLeave()){node.value=state.activeDate;return;}selectDate(node.value);return;}
   if(node.id==='player-edit'){if(!canLeave()){node.value=selectedPlayerId;return;}selectedPlayerId=node.value;render();focusElement('#person-name');return;}
