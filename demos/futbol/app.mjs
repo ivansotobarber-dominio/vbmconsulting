@@ -17,6 +17,8 @@ import {weekNavigation,microcycleToolbar,planForm,renderSeason,renderIndividual,
 import {boardItems,itemKind,itemName} from './board-v4.mjs';
 const DAYS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
 const SHORT = ['LUN', 'MAR', 'MIÉ', 'JUE', 'VIE', 'SÁB', 'DOM'];
+const CLUB_MODE=document.querySelector('meta[name="terreno-runtime"]')?.content==='club-local';
+let clubWorkspace=null,clubEpoch=0;
 const PLAYERS = Array.from({ length: 18 }, (_, i) => ({ id: `p${i + 1}`, name: `Jugador ${String(i + 1).padStart(2, '0')}` }));
 const LIBRARY = [
   { id: 'rondo', title: 'Rondo de orientación', category: 'Activación · 12 × 12 m', duration: 15, objective: 'Orientar el primer control y encontrar al tercer jugador.' },
@@ -99,7 +101,7 @@ function fresh() {
 function ownLibrary(){
   return LIBRARY.map(t=>({...enrichTask({id:t.id,libraryId:t.id,title:t.title,duration:t.duration,objective:t.objective}),participants:8,jokers:2,length:30,width:25,type:t.category,part:'Principal',attackObjective:'Crear apoyos y líneas de pase.',defendObjective:'Cerrar espacios y coordinar la recuperación.',description:'Ejercicio sintético de preparación colectiva con oposición y apoyos.',variants:'Variar el espacio o limitar los contactos.',board:{pieces:Array.from({length:8},(_,i)=>({id:uid(),kind:'player',label:String(i+1),x:25+(i%4)*16,y:30+Math.floor(i/4)*35,team:i<3?'A':i<6?'B':'wildcard'})),arrows:[],zones:[],text:'Organización ficticia editable.'}}));
 }
-const store=new LocalStoreV4({key:KEY,parse:clean,seed:fresh,legacy:[
+const store=CLUB_MODE?null:new LocalStoreV4({key:KEY,parse:clean,seed:fresh,legacy:[
   {key:V6KEY,convert:s=>migrateV6(parseV6(s,LIBRARY,FORMATIONS))},
   {key:V5KEY,convert:s=>migrateV6(migrateV5(parseV5(s,LIBRARY,FORMATIONS)))},
   {key:V4KEY,convert:s=>migrateV6(migrateV5(migrateV4(parseV4(s,LIBRARY,FORMATIONS))))},
@@ -107,9 +109,9 @@ const store=new LocalStoreV4({key:KEY,parse:clean,seed:fresh,legacy:[
   {key:V2KEY,convert:s=>migrateV6(migrateV5(migrateV4(migrateV3(migrateV2(parseV2(s,LIBRARY,FORMATIONS),ownLibrary())))))},
   {key:V1KEY,convert:s=>migrateV6(migrateV5(migrateV4(migrateV3(migrateV2(migrate(parseV1(s,LIBRARY,FORMATIONS,PLAYERS),PLAYERS),ownLibrary())))))},
 ]});
-function syncStore(){storageBlocked=store.blocked;if(store.message)storageMessage=store.message;expectedRaw=store.raw;migrationSources=store.sources;needsInitialSave=store.needsSave;}
+function syncStore(){if(CLUB_MODE)return;storageBlocked=store.blocked;if(store.message)storageMessage=store.message;expectedRaw=store.raw;migrationSources=store.sources;needsInitialSave=store.needsSave;}
 function load(){const value=store.read();syncStore();return value;}
-let state = load();
+let state = CLUB_MODE?null:load();
 let view = 'home';
 let section = 'week';
 let period = 'week';
@@ -120,7 +122,7 @@ let selectedExerciseId = null;
 let exerciseOwner = 'session';
 let exerciseSummaryOnly = false;
 const ui4={weekMode:'microcycle',fixtureId:null,phaseId:null,recordId:null,nutritionId:null,problemId:null,variantId:null,frameIndex:-1,boardContext:'',framePrint:null};
-const rosterUi=rosterDefaults(state);
+let rosterUi=CLUB_MODE?null:rosterDefaults(state);
 const motion=matchMedia('(prefers-reduced-motion: reduce)');
 const libraryUi=libraryDefaults();
 let homeReturn=null;
@@ -136,7 +138,7 @@ let planningExerciseId = null;
 const formNames={'session-edit':'Sesión','exercise-form':'Ejercicio','analysis-form':'Análisis','match-form':'Once','board-form':'Consigna','person-form':'Ficha','new-session-form':'Nueva sesión','v4-plan-session':'Planificación de sesión','v4-plan-exercise':'Planificación de ejercicio','v4-fixture':'Partido de referencia','v4-phase':'Fase','v4-season':'Temporada','v4-record':'Registro ficticio','v4-nutrition':'Pauta ficticia','v4-problem':'Problema','v4-partitions':'Banquillo y consignas'};
 Object.assign(formNames,{'v5-profile':'Datos deportivos','v5-season':'Temporada deportiva','v5-competition':'Competición','v5-session-season':'Atribución de sesión','v5-stat':'Estadística de partido','v5-rule':'Nueva versión de regla','v5-sanction':'Sanción manual'});
 Object.assign(formNames,{'v7-load-form':'Volumen e índice DEMO','v7-categories':'Categorías manuales','v7-analysis-form':'Plan prepartido','v7-phase-form':'Nombre de fase'});
-const coreForms=()=>$$('form').filter(form=>!form.closest('.academy-v7'));
+const coreForms=()=>$$('form').filter(form=>!form.closest('.academy-v7,[data-club-ui]'));
 function formSignature(form){return JSON.stringify([...form.elements].filter(f=>['INPUT','TEXTAREA','SELECT'].includes(f.tagName)&&!['submit','button','reset','image'].includes(f.type)).map((f,i)=>[f.id||f.name||i,f.type==='file'?[...f.files].map(v=>[v.name,v.size,v.type,v.lastModified]):['checkbox','radio'].includes(f.type)?f.checked:f.multiple?[...f.selectedOptions].map(o=>o.value):f.value,Boolean(f.validity?.badInput)]));}
 function refreshDirty(){
   dirtyForms.clear();
@@ -176,13 +178,18 @@ function notify(message, error = false) {
   clearTimeout(noticeTimer); noticeTimer = setTimeout(() => { node.hidden = true; }, 4500);
 }
 function storageUI() {
+  if(CLUB_MODE){$('#save-status').textContent=(dirty?'Formulario sin guardar · ':'')+(clubWorkspace?.status??'Sin sesión de club');return;}
   $('#storage-warning').hidden = !storageMessage;
   $('#storage-warning').textContent = storageMessage;
   const pending=dirty?`${dirtyForms.size} ${dirtyForms.size===1?'formulario pendiente':'formularios pendientes'} · `:'';
   const status=pending+(storageBlocked?'Equipo sin guardar · solo en memoria':store.needsSave?'Equipo en memoria · pendiente de guardado explícito':`${dirty?'Último guardado del equipo':'Equipo guardado localmente'} · ${new Date(state.updatedAt).toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'})}`);
   if($('#save-status').textContent!==status)$('#save-status').textContent=status;
 }
-function save(message) {
+function save(message,form=null) {
+  if(CLUB_MODE){
+    if(!clubWorkspace?.hasAccess||!state)return false;
+    try{return clubWorkspace.queue(state,form?[{id:form.id,signature:formSignature(form)}]:[]);}catch(error){notify('No se confirmó el guardado. Revisa los datos del equipo.',true);return false;}
+  }
   try{const result=store.write(state);state=result.state;syncStore();}catch(error){notify(`No se guardó: ${error.message}`,true);return false;}
   storageUI();
   if (message) notify(storageBlocked ? `${message} Solo en memoria; no guardado local.` : message, storageBlocked);
@@ -201,6 +208,7 @@ function focusElement(selector) { $(selector)?.focus(); }
 function focusOpen(selector){const node=$(selector);for(let parent=node?.parentElement;parent;parent=parent.parentElement)if(parent.tagName==='DETAILS')parent.open=true;node?.focus();}
 function selectRosterPlayer(id){if(!state.players.some(p=>p.id===id))return;rosterUi.playerId=selectedPlayerId=id;rosterUi.statId=rosterUi.sanctionId=null;ui4.recordId=ui4.nutritionId=null;render();focusElement('.roster-player-title');}
 function changeView(next, focus = false, keepReturn = false) {
+  if(CLUB_MODE&&(!state||next==='academy'))return false;
   playback.stop();
   if (!canLeave()) return false;
   playback.stop();if(next!=='summary')ui4.framePrint=null;
@@ -213,6 +221,7 @@ function heading(title, subtitle, actions = '') {
   return `<div class="view-heading"><div><p class="eyebrow">Terreno · ${esc(monday(state.activeDate))}</p><h1 tabindex="-1">${title}</h1><p>${subtitle}</p></div><div class="heading-actions">${actions}${view!=='summary'?`<button class="icon-button secondary" data-action="summary" title="Resumen del contexto" aria-label="Resumen del contexto">${icon('clipboard-list')}</button>`:''}</div></div>`;
 }
 function render(preview=false) {
+  if(CLUB_MODE&&!state)return;
   const enteringBoard=view==='board'&&document.body.dataset.view!=='board',openBoardDetails=$$('.v7-tactical-workspace details[open]').map(n=>n.id),oldBoardContext=ui4.boardContext;
   if(view==='academy'&&academyController)return;
   if(academyController){academyController.destroy();academyController=null;}
@@ -243,7 +252,7 @@ function render(preview=false) {
   if(analysisReturn&&view==='week'&&$('.exercise-sheet'))$('.exercise-sheet').insertAdjacentHTML('afterbegin',`<div class="context-return"><button class="secondary" data-action="return-analysis" title="Volver al análisis de origen">${icon('arrow-left')}Volver al análisis</button></div>`);
   for(const link of $$('[data-action="open-exercise-link"]')){const target=exerciseTarget(state.problems.find(p=>p.id===link.dataset.id)?.exerciseId);link.disabled=!target;link.title=target?`Ir al ejercicio: ${target.exercise.title}`:'Ejercicio no disponible';}
   if(oldBoardContext===ui4.boardContext)for(const id of openBoardDetails){const node=document.getElementById(id);if(node)node.open=true;}
-  baselineForms();icons();storageUI();if(enteringBoard)window.scrollTo(0,0);
+  baselineForms();icons();storageUI();if(CLUB_MODE)clubReadonly();if(enteringBoard)window.scrollTo(0,0);
 }
 async function mountAcademyView(){
   const token=academyMountToken,node=$('#academy-v7-root');
@@ -326,7 +335,7 @@ function renderBoard(){
 function renderAnalysisBase() {
   return heading('Lectura del juego', 'Equipo propio y rival ficticio') + `<form id="analysis-form"><div class="analysis-grid">${[['own','Equipo propio'],['rival','Rival de demo']].map(([k,title]) => `<section class="analysis-column"><h2>${title}</h2>${Object.entries(PHASES).map(([f,label]) => `<label for="${k}-${f}">${label}</label><textarea id="${k}-${f}" name="${k}-${f}" maxlength="3000" rows="3">${esc(state.analysis[k][f])}</textarea>`).join('')}<details class="legacy-notes"><summary>Notas anteriores</summary>${[['strengths','Fortalezas'],['weaknesses','Debilidades'],['notes','Notas']].map(([f,label])=>summaryText(label,state.analysis[k][f])).join('')}</details></section>`).join('')}</div><div class="form-footer"><button class="primary" type="submit">${icon('check')}Guardar análisis</button></div></form><section class="roster-section"><div class="section-heading"><h2>Rivales adultos ficticios</h2><button class="secondary" data-action="new-rival">${icon('user-plus')}Nueva ficha</button></div><div class="roster-list">${state.rivals.map(p=>`<button class="session-choice" data-action="edit-rival" data-id="${esc(p.id)}">${avatar(p)}${esc(p.name)}</button>`).join('')}</div>${selectedRivalId?personEditor('rival'):''}</section>`;
 }
-let selectedPlayerId = state.players[0].id;
+let selectedPlayerId = state?.players[0]?.id??null;
 function avatar(p){return p.photo?`<img class="avatar" src="${esc(p.photo)}" alt="Avatar ficticio">`:`<span class="avatar initials" aria-hidden="true">${esc(p.name.slice(0,2).toUpperCase())}</span>`;}
 function personEditor(kind) {
   const rival=kind==='rival';const p=(rival?state.rivals:state.players).find(p=>p.id===(rival?selectedRivalId:selectedPlayerId));if(!p)return '';
@@ -471,7 +480,7 @@ function refreshExercise(){
   const day=$(`[data-date="${state.activeDate}"] .day-load`);if(day)day.textContent=`${state.sessions.filter(a=>a.date===state.activeDate).reduce((n,a)=>n+minutes(a),0)} min`;
 }
 function commitV4(candidate,message,form=null,rerender=true){
-  try{const normalized=clean(candidate);JSON.stringify(normalized);state=normalized;const saved=save(message);if(form&&saved)savedForm(form);if(rerender&&!dirty)render();return saved;}catch(error){notify(error.message,true);return false;}
+  try{const normalized=clean(candidate);JSON.stringify(normalized);state=normalized;const saved=save(message,form);if(form&&saved)savedForm(form);if(rerender&&!dirty)render();return saved;}catch(error){notify(error.message,true);return false;}
 }
 function exportFrame(){
   const frame=currentBoard(),root=currentBoardRoot(),name=ui4.frameIndex<0?'Base':root.frames[ui4.frameIndex].title;
@@ -535,7 +544,7 @@ function v7Action(action,b){
   if(action==='v7-rename-phase'){
     const form=$('#v7-phase-form'),title=$('#v7-phase-title')?.value.trim(),frame=currentBoardRoot()?.frames[ui4.frameIndex];
     if(!frame||!title)return notify('Escribe un nombre de fase.',true),true;
-    frame.title=title;if(save('Nombre de fase guardado.')){savedForm(form);if(!dirty)render();}return true;
+    frame.title=title;if(save('Nombre de fase guardado.',form)){savedForm(form);if(!dirty)render();}return true;
   }
   if(!canLeave())return true;
   if(action==='v7-field'){currentBoard().fieldMode=b.dataset.value;save('Encuadre guardado, coordenadas conservadas.');render();return true;}
@@ -704,6 +713,7 @@ document.addEventListener('click', event => {
   }
 });
 document.addEventListener('submit', async event => {
+  const submitEpoch=clubEpoch;
   playback.stop();
   event.preventDefault(); const form = event.target;
   if (!form.reportValidity()) return;
@@ -725,6 +735,7 @@ document.addEventListener('submit', async event => {
     commitV4(candidate,'Plan prepartido guardado.',form);return;
   }
   if(form.id==='v7-phase-form'){v7Action('v7-rename-phase',form);return;}
+  if(form.id==='v4-plan-session'&&form.elements.tacticalObjective.value===form.elements.tacticalObjective.defaultValue)data.set('tacticalObjective',currentSession().tacticalObjective);
   if(form.id.startsWith('v4-')||form.id.startsWith('v5-')){try{const candidate=submitRoster(form,data,state,rosterUi,ui4,formCandidate,section);if(candidate)commitV4(candidate,'Datos ficticios guardados.',form);}catch(error){notify(error.message,true);}return;}
   if (form.id === 'new-session-form') {
     const title = data.get('title').trim(); if (!title) { $('#new-title').setCustomValidity('Escribe un nombre de sesión.'); $('#new-title').reportValidity(); return; }
@@ -734,8 +745,8 @@ document.addEventListener('submit', async event => {
   } else if (form.id === 'session-edit') {
     const title = data.get('title').trim(); if (!title) { $('#session-title').setCustomValidity('Escribe un nombre de sesión.'); $('#session-title').reportValidity(); return; }
     if(!data.get('date')){notify('La sesión requiere una fecha.',true);return;}
-    const s=currentSession();s.title=title;s.objective=data.get('objective');s.tacticalObjective=data.get('tacticalObjective');s.date=data.get('date');s.intensity=data.get('intensity')===''?null:Number(data.get('intensity'));s.called=data.getAll('called');state.activeDate=s.date;
-    if(save('Sesión guardada.')){savedForm(form);if(!dirty){render();focusElement('#session-objective');}else refreshExercise();}
+    const s=currentSession();s.title=title;s.objective=data.get('objective');if(form.elements.tacticalObjective.value!==form.elements.tacticalObjective.defaultValue)s.tacticalObjective=data.get('tacticalObjective');s.date=data.get('date');s.intensity=data.get('intensity')===''?null:Number(data.get('intensity'));s.called=data.getAll('called');state.activeDate=s.date;
+    if(save('Sesión guardada.',form)){savedForm(form);if(!dirty){render();focusElement('#session-objective');}else refreshExercise();}
   } else if(form.id==='exercise-form'){
     const t=currentExercise(),next={...t,title:data.get('title').trim(),duration:data.get('duration')===''?null:Number(data.get('duration'))};
     next.objectiveTags=data.getAll('objectiveTags');
@@ -744,18 +755,18 @@ document.addEventListener('submit', async event => {
     if(next.jokers!==null&&(next.participants===null||next.jokers>next.participants)){$('#exercise-error').textContent='Los comodines están incluidos en el total y no pueden superarlo; informa el total.';return;}
     for(const k of Object.keys(TEXTS))next[k]=data.get(k);
     const tasks=exerciseOwner==='library'?state.library:currentSession().tasks;tasks[tasks.findIndex(a=>a.id===t.id)]=next;
-    if(save('Ejercicio guardado.')){savedForm(form);$('#exercise-error').textContent='';refreshExercise();}
+    if(save('Ejercicio guardado.',form)){savedForm(form);$('#exercise-error').textContent='';refreshExercise();}
   } else if (form.id === 'analysis-form') {
     const side=form.dataset.side;
     for (const f of [...Object.keys(PHASES),'notes']) state.analysis[side][f] = data.get(`${side}-${f}`);
-    if(save('Análisis guardado.'))savedForm(form);
+    if(save('Análisis guardado.',form))savedForm(form);
   } else if (form.id === 'match-form') {
     const lineup = Array.from({length:11},(_,i) => data.get(`slot-${i}`));
     if (!unique(lineup)) { $('#match-error').textContent = 'Hay jugadores repetidos en el once. Cada posición debe tener un jugador distinto.'; $('#match-error').tabIndex = -1; $('#match-error').focus(); return; }
     const candidate=structuredClone(state),target=ui4.variantId?candidate.match.variants.find(v=>v.id===ui4.variantId):candidate.match;Object.assign(target,{formation:data.get('formation'),lineup});
     if(commitV4(candidate,'Plan de partido guardado.',form,false))$('#match-error').textContent='';else $('#match-error').textContent='No se confirma guardado: revisa particiones, disponibilidad de almacenamiento y avisos.';
   } else if(form.id==='board-form') {
-    currentBoard().text=data.get('text');if(save('Consigna guardada.'))savedForm(form);
+    currentBoard().text=data.get('text');if(save('Consigna guardada.',form))savedForm(form);
   } else if(form.id==='person-form') {
     if(photoBusy)return;
     const rival=form.dataset.kind==='rival';const collection=rival?state.rivals:state.players;const p=collection.find(p=>p.id===form.dataset.id);
@@ -763,9 +774,10 @@ document.addEventListener('submit', async event => {
     if(rival)Object.assign(next,{age:Number(data.get('age')),height:Number(data.get('height')),foot:data.get('foot'),description:data.get('description')});
     else {next.dorsal=Number(data.get('dorsal'));if(state.players.some(a=>a.id!==p.id&&a.dorsal===next.dorsal))return notify('Dorsal repetido.',true);}
     const file=$('#person-photo').files[0];
-    if(file){if(!$('#photo-fictional').checked)return notify('Confirma que la imagen es ficticia, sin personas reales.',true);photoBusy=true;$('#photo-status').textContent='Validando imagen local…';try{next.photo=await readPhoto(file);}catch(error){$('#photo-status').textContent=error.message;notify('Foto rechazada. Se conserva la anterior.',true);photoBusy=false;return;}finally{photoBusy=false;}}
+    if(file){if(!$('#photo-fictional').checked)return notify('Confirma que la imagen es ficticia, sin personas reales.',true);photoBusy=true;$('#photo-status').textContent='Validando imagen local…';try{next.photo=await readPhoto(file);}catch(error){if(CLUB_MODE&&submitEpoch!==clubEpoch)return;$('#photo-status').textContent=error.message;notify('Foto rechazada. Se conserva la anterior.',true);photoBusy=false;return;}finally{if(!CLUB_MODE||submitEpoch===clubEpoch)photoBusy=false;}}
+    if(CLUB_MODE&&submitEpoch!==clubEpoch)return;
     collection[collection.indexOf(p)]=next;
-    if(save('Ficha guardada.')){savedForm(form);if(!dirty){render();focusElement('#person-name');}else {$('#photo-status').textContent='Ficha guardada. Hay otro formulario pendiente.';const image=form.querySelector('.avatar');if(image)image.outerHTML=avatar(next);}}else $('#photo-status').textContent='Ficha y foto solo en memoria; exporta antes de cerrar.';
+    if(save('Ficha guardada.',form)){savedForm(form);if(!dirty){render();focusElement('#person-name');}else {$('#photo-status').textContent='Ficha guardada. Hay otro formulario pendiente.';const image=form.querySelector('.avatar');if(image)image.outerHTML=avatar(next);}}else $('#photo-status').textContent='Ficha y foto solo en memoria; exporta antes de cerrar.';
   }
 });
 document.addEventListener('input', event => {
@@ -864,15 +876,64 @@ function endDrag(event) {
 document.addEventListener('pointerup',endDrag);
 document.addEventListener('pointercancel',endDrag);
 document.addEventListener('focusin', event => { const p = event.target.closest('[data-piece]'); if (p) { selectedPieceId = p.dataset.piece; updatePiece(); } });
-window.addEventListener('beforeunload', event => { if (dirty||academyController?.hasPendingChanges()) { event.preventDefault(); event.returnValue = ''; } });
+window.addEventListener('beforeunload', event => { if (dirty||academyController?.hasPendingChanges()||clubWorkspace?.hasPending()) { event.preventDefault(); event.returnValue = ''; } });
 window.addEventListener('beforeprint',()=>playback.stop());
 window.addEventListener('storage', event => {
+  if(CLUB_MODE)return;
   if (!store.affected(event.key)) return;
   playback.stop();store.conflict();syncStore();
   storageUI();
 });
 for (const dialog of $$('dialog')) {dialog.addEventListener('close', () => { if (dialogTrigger?.isConnected) dialogTrigger.focus(); });dialog.addEventListener('cancel',event=>{if(!canLeave())event.preventDefault();});}
-render();
+const clubReadActions=new Set(['v6-home','v6-continue','v6-goto','v6-open-session','v6-open-general','goto-week','day','session','period','calendar-prev','calendar-next','summary','print','exercise-summary','back','close-dialog','v7-present','v7-report','v7-present-back','v7-present-next','v7-present-exit','v7-present-print','v7-calendar-season','v7-season-month','v7-own-player','v5-select-player','edit-rival','select-exercise','planning-preview','library','v6-select-library','v6-clear-filter','leave-library','return-analysis','open-exercise-link','match-board','open-board','export','v4-play','v4-step-next','v4-step-back','v6-stop','v4-export-svg','v4-print-frame','v7-record','v7-record-stop']);
+function clubReadonly(){
+  const readonly=!clubWorkspace?.canWrite;
+  $('#view-panel').classList.toggle('club-readonly',readonly);
+  if(readonly){
+    for(const form of coreForms())for(const control of form.elements)if(!control.dataset.action||!clubReadActions.has(control.dataset.action))control.disabled=true;
+    for(const button of $$('[data-action]',$('#view-panel')))if(!clubReadActions.has(button.dataset.action))button.disabled=true;
+    for(const control of $$('[data-v7-color],[data-coordinate],#add-kind,#piece-team,#piece-role,#piece-label',$('#view-panel')))control.disabled=true;
+  }
+  $('#tab-academy').disabled=true;$('#tab-academy').title='Academia no disponible en modo club';
+  $('[data-action="reset"]').hidden=true;
+}
+function clubGuard(event){
+  if(!CLUB_MODE||event.target.closest('[data-club-ui]'))return;
+  const node=event.target,action=node.closest('[data-action]')?.dataset.action;
+  let deny=!clubWorkspace?.hasAccess||action==='reset'||node.closest('[data-tab="academy"]');
+  if(!deny&&!clubWorkspace.canWrite){
+    if(event.type==='submit')deny=true;
+    else if(event.type==='click'&&action&&!clubReadActions.has(action))deny=true;
+    else if(['change','input'].includes(event.type))deny=Boolean(node.closest('form,#board-inspector')||node.matches('[data-v7-color],[data-task-field]'));
+    else if(['pointerdown','pointermove'].includes(event.type))deny=Boolean(node.closest('[data-piece]'));
+    else if(event.type==='keydown')deny=Boolean(node.closest('[data-piece]')&&['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(event.key));
+  }
+  if(deny){event.preventDefault();event.stopImmediatePropagation();}
+}
+function clearClubWorkspace(){
+  clubEpoch++;playback.stop();drag=null;photoBusy=false;state=null;rosterUi=null;selectedPlayerId=selectedRivalId=selectedExerciseId=selectedPieceId=null;exerciseOwner='session';homeReturn=analysisReturn=null;planningExerciseId=null;analysisSide='own';view='home';section='week';period='week';boardKey=null;dialogTrigger=null;previousView='week';exerciseSummaryOnly=false;presentationIndex=0;presentationPrint=false;
+  Object.assign(ui4,{weekMode:'microcycle',fixtureId:null,phaseId:null,recordId:null,nutritionId:null,problemId:null,variantId:null,frameIndex:-1,boardContext:'',framePrint:null});Object.assign(libraryUi,libraryDefaults());dirty=false;dirtyForms.clear();formBaselines.clear();
+  $('#view-panel').replaceChildren();$('#library-items').replaceChildren();for(const form of coreForms())HTMLFormElement.prototype.reset.call(form);for(const dialog of $$('dialog:not([data-club-ui] dialog)'))if(!dialog.closest('[data-club-ui]'))dialog.close();
+  $('#notice').hidden=true;$('#notice').textContent='';$('#storage-warning').hidden=true;$('.workspace').hidden=true;$('.team-identity strong').textContent='Sin equipo abierto';$('.team-identity span').textContent='Piloto local · Adultos ficticios';
+}
+if(CLUB_MODE){
+  const {mountClubWorkspace}=await import('./club-client-v8.mjs');
+  document.body.dataset.clubRuntime='true';$('.demo-badge').textContent='CLUB LOCAL';$('.workspace').hidden=true;$('#tab-academy').disabled=true;
+  for(const type of ['click','submit','input','change','pointerdown','pointermove','keydown'])document.addEventListener(type,clubGuard,true);
+  clubWorkspace=mountClubWorkspace({parse:clean,icons,hasDirty:()=>{refreshDirty();return dirty||photoBusy;},exportCandidate:exportData,clear:clearClubWorkspace,onStatus:storageUI,
+    applyState:(next,preserveNavigation)=>{
+      if(preserveNavigation&&state){next.activeDate=state.activeDate;next.selectedSessionId=next.sessions.some(s=>s.id===state.selectedSessionId&&s.date===next.activeDate)?state.selectedSessionId:null;}
+      state=clean(next);rosterUi=rosterDefaults(state);selectedPlayerId=state.players[0].id;$('.workspace').hidden=false;$('.team-identity strong').textContent=clubWorkspace.context?.teamName??'Equipo local';render();
+    },ack:(next,tickets)=>{
+      if(!state)return;state.revision=next.revision;state.updatedAt=next.updatedAt;
+      for(const ticket of tickets??[]){const form=document.getElementById(ticket.id);if(form&&formSignature(form)===ticket.signature)savedForm(form);}storageUI();
+      const session=currentSession(),confirmed=next.sessions.find(s=>s.id===session?.id);
+      if(session&&confirmed?.tacticalObjective===session.tacticalObjective)for(const id of ['session-edit','v4-plan-session']){
+        const form=document.getElementById(id),field=form?.elements.tacticalObjective;
+        if(field&&!dirtyForms.has(id)&&field.value!==session.tacticalObjective){field.value=session.tacticalObjective;savedForm(form);}
+      }
+    }});
+}else render();
 document.addEventListener('visibilitychange',()=>{if(document.hidden)playback.stop();});
 document.addEventListener('focusin',event=>{if(event.target.matches('input,select,textarea'))playback.stop();});
 motion.addEventListener('change',()=>{playback.stop();const button=$('[data-action="v4-play"]');if(button)button.disabled=motion.matches||!currentBoardRoot()?.frames.length;});
