@@ -41,6 +41,14 @@ const files = [
   'demos/futbol/planning-v7.css',
   'demos/futbol/planning-v7.mjs',
   'demos/futbol/playback-v7.mjs',
+  'demos/futbol/model-v8.mjs',
+  'demos/futbol/matchboards-v8.mjs',
+  'demos/futbol/matchboards-v8.css',
+  'demos/futbol/domain-model-v8.mjs',
+  'demos/futbol/domain-view-v8.mjs',
+  'demos/futbol/domain-v8.css',
+  'demos/futbol/print-v8.mjs',
+  'demos/futbol/print-v8.css',
 ];
 
 function packagePublic(destination) {

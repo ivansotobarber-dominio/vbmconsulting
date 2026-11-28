@@ -1,0 +1,76 @@
+.v8m-workspace{margin-block:20px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.v8m-workspace>.section-heading,.v8m-workspace>form{grid-column:1/-1}
+.v8m-group{padding-block:8px;border-top:1px solid #d5ddd8;min-width:0}
+.v8m-list{display:grid;grid-template-columns:minmax(0,1fr);gap:8px}
+.v8m-item{display:flex;align-items:center;flex-wrap:wrap;gap:4px;border:1px solid #d5ddd8;border-radius:6px;min-width:0;padding-bottom:4px}
+.v8m-open{display:grid;grid-template-columns:minmax(0,1fr);align-items:center;gap:8px;flex:1 1 100%;min-width:0;text-align:left;padding:8px;background:transparent;border:0;min-height:80px}
+.v8m-open>svg{width:100%;max-width:320px;justify-self:center;height:auto;aspect-ratio:auto;max-height:none;overflow:hidden;margin:0}
+.v8m-open span,.v8m-open small{display:block;overflow-wrap:anywhere}
+.v8m-open small{font-weight:400;margin-top:4px;white-space:pre-wrap}
+.v8m-actions{display:flex;flex-wrap:wrap;gap:6px}
+.v8m-meta{padding-block:12px;display:grid;gap:6px}
+.v8m-projection{max-width:1100px;margin:auto}
+.v8m-projection>svg.v7-pitch{display:block;width:100%;height:auto;aspect-ratio:auto;max-height:none;overflow:hidden}
+.v8m-projection p{white-space:pre-wrap;overflow-wrap:anywhere}
+svg.v7-pitch{overflow:hidden}
+.v8m-workspace button,.v8m-meta button,.v8m-projection button{min-height:44px}
+.v8m-workspace button:focus-visible,.v8m-meta :focus-visible,.v8m-projection button:focus-visible{outline:3px solid #1b6956;outline-offset:2px}
+.v8m-print-options{display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding-block:8px}
+.v8m-print-options label{display:flex;align-items:center;gap:6px;margin:0;min-height:44px}
+.v8m-print-options input[type=checkbox]{width:18px;height:18px;min-height:18px;flex:none;padding:0}
+.v8m-print-warning{color:#7a3815;font-weight:600}
+.v8m-view-actions{display:flex;flex-wrap:wrap;gap:6px;margin-block:12px}
+@media(max-width:1100px){.v8m-workspace{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.v8m-workspace{grid-template-columns:minmax(0,1fr)}.v8m-group .section-heading{align-items:center}}
+@media print{.v8m-view-actions,.v8m-print-options{display:none!important}}
+body[data-view=match] .app-header{height:64px;padding-inline:24px;gap:16px}
+body[data-view=match] .brand{font-size:22px;gap:8px}
+body[data-view=match] .brand-symbol{width:36px;height:36px;font-size:22px}
+body[data-view=match] .brand-sub{display:none}
+body[data-view=match] .team-identity{padding-left:16px}
+body[data-view=match] .club-v8{padding-block:8px}
+body[data-view=match] .club-account{gap:6px 12px}
+body[data-view=match] .club-notice{margin:4px 0 0;font-size:12px}
+body[data-view=match] .club-notice:empty{display:none}
+body[data-view=match] .club-sync{font-size:12px;gap:4px 12px;margin-top:4px}
+.v8m-context{margin-block:2px}
+.v8m-context>summary{min-height:44px;align-content:center;font-size:13px;font-weight:600;cursor:pointer;overflow-wrap:anywhere}
+.v8m-context .club-context>label{margin:4px 0}
+body[data-view=match] .tabs button{min-height:48px;padding-block:6px}
+body[data-view=match] .nav-row{gap:4px}
+body[data-view=match] main{padding-top:10px}
+body[data-view=match] .view-heading{margin-bottom:8px;gap:8px;align-items:center}
+body[data-view=match] .view-heading h1{font-size:22px;margin-bottom:2px}
+body[data-view=match] .view-heading p{font-size:12px}
+body[data-view=match] .view-heading>div>p:last-child:not(.eyebrow){display:none}
+body[data-view=match] .v8m-group>.section-heading{margin-bottom:6px}
+body[data-view=match] .v8m-open{gap:6px}
+body[data-view=match] #view-panel>.v4-context{padding:8px 0;margin:0 0 8px;gap:8px;grid-template-columns:minmax(0,1fr) auto;align-items:end}
+body[data-view=match] #view-panel>.v4-context label{margin:0 0 4px}
+body[data-view=match] #view-panel>.v4-context .aligned-command{margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px}
+body[data-view=match] #view-panel>.v4-context .aligned-command button{width:auto}
+body[data-view=match] .v8m-workspace{margin-block:6px;gap:10px 16px}
+body[data-view=match] .v8m-workspace>.section-heading{margin-bottom:0;flex-wrap:wrap}
+body[data-view=match] .v8m-workspace>.section-heading h2{font-size:18px}
+@media(max-width:760px){
+  body[data-view=match] .app-header{height:auto;min-height:64px;padding:6px 16px;display:grid;grid-template-columns:minmax(0,1fr) 44px auto;gap:4px 8px}
+  body[data-view=match] .app-header>.team-identity{grid-column:1/-1;grid-row:2;display:flex;flex-direction:row;flex-wrap:wrap;gap:2px 6px;padding:0;border:0;font-size:12px}
+  body[data-view=match] .team-identity strong{font-size:12px}
+  body[data-view=match] .header-end{grid-column:3;grid-row:1;gap:0;margin:0}
+  body[data-view=match] .header-end .demo-badge{display:inline-flex}
+  body[data-view=match] .club-v8{padding:6px 16px}
+  body[data-view=match] .club-account{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 8px}
+  body[data-view=match] .club-account>strong{font-size:13px;overflow-wrap:anywhere}
+  body[data-view=match] .club-account>span{grid-column:1;grid-row:2;width:auto;font-size:12px}
+  body[data-view=match] .club-account>button{grid-column:2;grid-row:1/3;margin:0;padding-inline:8px;font-size:13px}
+  body[data-view=match] .tabs button{min-height:48px}
+  body[data-view=match] .v8m-workspace>.section-heading{gap:6px}
+  body[data-view=match] .v8m-workspace>.section-heading .v8m-actions{margin-left:auto}
+}
+@media(max-width:760px){
+  body[data-view=match] .app-header{grid-template-columns:minmax(0,1fr) repeat(3,44px)}
+  body[data-view=match] .header-end{display:contents}
+  body[data-view=match] .header-end .demo-badge{grid-column:1/-1;grid-row:3;justify-self:start;max-width:100%;white-space:normal;margin:0;min-height:44px}
+  body[data-view=match] .header-end [data-action=export]{grid-column:3;grid-row:1}
+  body[data-view=match] .header-end [data-action=print]{grid-column:4;grid-row:1}
+}
